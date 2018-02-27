@@ -1,57 +1,51 @@
 package main;
 
-import entities.Places;
-import entities.Town;
+import com.sun.org.apache.xpath.internal.SourceTree;
 import es.uji.belfern.generador.GeneradorDatosINE;
+import places.Places;
+import places.Town;
 
-import java.io.PrintStream;
 import java.util.Date;
 import java.util.Scanner;
 
+/**
+ * Created by al361930 on 20/02/18.
+ */
 public class Main {
     static Places places = new Places();
 
-    public void test(){
+    public static void main(String args[]) {
+
+        /*
         GeneradorDatosINE gen = new GeneradorDatosINE();
         for (int i = 0; i < 100; i++) {
-            String prov = gen.getProvincia();
-            System.out.printf("%s %s %s [%s años] *%s*: %s (%s)\n", gen.getNombreHombre(),
+            System.out.printf("%s %s %s %s %s (%s)\n", gen.getNombreHombre(),
                     gen.getApellido(), gen.getApellido(), gen.getEdad(), gen.getNIF(),
-                    gen.getPoblacion(prov), prov
+                    gen.getPoblacion(gen.getProvincia()), gen.getProvincia()
             );
         }
-        System.out.print("introduïx un codi postal: ");
-        Scanner sc = new Scanner(System.in);
-        if (sc.hasNext()){
-            String answer = sc.next();
-            Town town = places.getTown(answer);
-            if (town != null)
-                System.out.printf("%s (%s)%n", town.getName(), town.getProvince());
-            else
-                System.out.println("El codi postal no existeix.");
-        } else {
-            System.out.println("Això no és cap codi postal");
-        }
-    }
+*/
 
-    public static void main(String [] args){
+        System.out.println("inserta un numero:");
+        Scanner sc = new Scanner(System.in);
+        String str = sc.next();
+        Integer opción = Integer.valueOf(str);
+        System.out.printf("has pulsado: %d", opción);
+
+
         Date date;
         Date now = new Date();
         Long timestamp = now.getTime();
         System.out.println(timestamp);
         System.out.println(now.toString());
 
-        Llamada llamada = new Llamada();
-        System.out.println(llamada.getFecha());
-        long duracion = 300;
-        Date fecha = llamada.sumarSegundos(duracion);
-
 
         places.start();
-        for (int i = 100; i<100; i++) {
+        for (int i = 100; i < 100; i++) {
             Town t = places.fetchTown();
             System.out.printf("%s %s (%s)%n", t.getZipCode(), t.getName(), t.getProvince());
-        }
 
+
+        }
     }
 }

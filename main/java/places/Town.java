@@ -1,4 +1,4 @@
-package entities;
+package places;
 
 public class Town {
     //Atributes

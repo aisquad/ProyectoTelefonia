@@ -1,4 +1,4 @@
-package entities;
+package places;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
