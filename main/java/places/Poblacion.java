@@ -1,13 +1,17 @@
 package places;
 
-public class Town {
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public class Poblacion {
     //Atributes
     private String zipCode;
     private String name;
     private String province;
+    private final String pattern = "^(0[1-9]|[1-4]\\d|5[012])\\d{3}$";
 
     //Constructors
-    public Town() {
+    public Poblacion() {
         zipCode = "";
         name = "";
         province = "";
@@ -18,7 +22,7 @@ public class Town {
         return zipCode;
     }
 
-    public String getName() {
+    public String getNombre() {
         return name;
     }
 
