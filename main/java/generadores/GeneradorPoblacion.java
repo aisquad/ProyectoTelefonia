@@ -11,13 +11,13 @@ import java.util.HashMap;
 
 public class GeneradorPoblacion extends  Generador{
     //Atributos
+    private ArrayList<String> listaCodPost;
     private HashMap<String, Poblacion> poblaciones;
-    private ArrayList<String> listaPobl;
     private HashMap<String, String> provincias;
 
     //Constructores
     public GeneradorPoblacion(){
-        listaPobl = new ArrayList<String>();
+        listaCodPost = new ArrayList<String>();
         provincias = leeFicheroProvincias();
         poblaciones = leeFicheroLocalidades();
     }
@@ -70,7 +70,7 @@ public class GeneradorPoblacion extends  Generador{
                 poblacion.setProvince(provincias.get(id.substring(0,2)));
                 poblacion.setZipCode(id);
                 entidades.put(id, poblacion);
-                listaPobl.add(id);
+                listaCodPost.add(id);
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -81,6 +81,6 @@ public class GeneradorPoblacion extends  Generador{
     }
 
     public Poblacion getPoblacion(){
-        return poblaciones.get(listaPobl.get(random.nextInt(listaPobl.size())));
+        return poblaciones.get(listaCodPost.get(random.nextInt(listaCodPost.size())));
     }
 }
