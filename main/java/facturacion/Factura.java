@@ -13,7 +13,7 @@ public class Factura implements Fecha {
     //Atributos
     private static int idFactura;
     private Date fechaEmision;
-    private Calendar periodoFacturacion;
+    private PeriodoFacturacion periodoFacturacion;
     private Double importe;
     private Cliente cliente;
 
@@ -26,10 +26,10 @@ public class Factura implements Fecha {
         cliente = null;
     }
 
-    public Factura (Calendar periodoFacturacion, Double importe, Cliente cliente) {
+    public Factura (Double importe, Cliente cliente) {
         idFactura++;
         fechaEmision = new Date();
-        this.periodoFacturacion = periodoFacturacion;
+        periodoFacturacion.calcularPeriodo(fechaEmision);
         this.importe = importe;
         this.cliente = cliente;
     }
