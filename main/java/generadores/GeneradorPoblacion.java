@@ -72,6 +72,8 @@ public class GeneradorPoblacion extends  Generador{
                 entidades.put(id, poblacion);
                 listaCodPost.add(id);
             }
+            buffer.close();
+            file.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {

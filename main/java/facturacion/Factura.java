@@ -21,7 +21,7 @@ public class Factura implements Fecha {
     public Factura () {
         idFactura++;
         fechaEmision = new Date();
-        periodoFacturacion = null;
+        periodoFacturacion = new PeriodoFacturacion();
         importe = 0d;
         cliente = null;
     }

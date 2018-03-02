@@ -28,6 +28,7 @@ public class GeneradorClientes extends Generador {
                 }
                 lista.add(line);
             }
+            buffer.close();
             file.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -50,6 +51,7 @@ public class GeneradorClientes extends Generador {
     }
 
     public String getDNI(){
+        //fte: https://es.wikipedia.org/wiki/N%C3%BAmero_de_identificaci%C3%B3n_fiscal
         String tabla = "TRWAGMYFPDXBNJZSQVHLCKE";
         int numero =  random.nextInt(99999999);
         return String.format("%08d%c", numero, tabla.charAt(numero % tabla.length()));
