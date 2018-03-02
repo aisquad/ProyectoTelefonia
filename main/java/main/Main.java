@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Scanner;
 
+import facturacion.PeriodoFacturacion;
 import generadores.GeneradorClientes;
 import generadores.GeneradorPoblacion;
 import places.Poblacion;
@@ -79,6 +80,10 @@ public class Main {
                 //bajaCliente();
                 break;
         }
+
+        PeriodoFacturacion p = new PeriodoFacturacion();
+        p.calcularPeriodo(new Date());
+        System.out.printf("%s%n", p.getPeriodo());
     }
 
 }
