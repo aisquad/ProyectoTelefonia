@@ -1,5 +1,7 @@
 package main;
 
+import clientes.Cliente;
+import clientes.Particular;
 import es.uji.belfern.generador.GeneradorDatosINE;
 
 import java.text.SimpleDateFormat;
@@ -8,17 +10,17 @@ import java.util.Locale;
 import java.util.Scanner;
 
 import facturacion.PeriodoFacturacion;
-import generadores.GeneradorClientes;
+import generadores.GeneradorParticulares;
 import generadores.GeneradorPoblacion;
-import places.Poblacion;
-
-import static main.OpcionesMenu.getMenu;
+import poblaciones.Poblacion;
 
 /**
  * Created by al361930 on 20/02/18.
  */
 public class Main {
     public static void main(String args[]) {
+        //Generador profe
+        System.out.println("Datos proporcionados por el generador del profesorado.");
         GeneradorDatosINE gen = new GeneradorDatosINE();
         for (int i = 0; i < 5; i++) {
             String provincia = gen.getProvincia();
@@ -30,6 +32,31 @@ public class Main {
             );
         }
 
+        /*
+        Generador propio
+
+        Nuestro generador crea nombres de personas basado en la lista de admitidos en las
+        universidades de la Comunidad Valenciana del año 2016. Y genera un Cliente con nombre,
+        apellido, dni, email  (cosa que no hace el generador proporcionado por el profesor,
+        pero que se nos pide en el enunciado).
+
+        También escoge al 'azar' un municipio obteniendo su CP (ídem que email).
+         */
+        System.out.println("\n\n\nEmpieza el muestreo de datos del generador propio.");
+        GeneradorParticulares genCli = new GeneradorParticulares();
+        GeneradorPoblacion genPobl = new GeneradorPoblacion();
+        for(int i = 0; i<5; i++){
+            Poblacion poblacion = genPobl.getPoblacion();
+            String nombre = genCli.getNombre();
+            String apellido =  genCli.getApellido();
+            System.out.printf(
+                    "%s %s %d %s %s%n\t%s %s (%s)%n",
+                    nombre, apellido, genCli.getEdad(), genCli.getDNI(), genCli.getEmail(nombre, apellido),
+                    poblacion.getCodigoPostal(), poblacion.getNombre(), poblacion.getProvincia()
+            );
+        }
+
+        //Prueba manipulación fechas
         Date now = new Date();
         Long timestamp = now.getTime();
         SimpleDateFormat fecha = new SimpleDateFormat(
@@ -40,23 +67,11 @@ public class Main {
                 "\n\ntimestamp de now: %d(long)\nnow.toString(): %s\nnow en castellano: %s\n\n"
                 , timestamp, now.toString(),fecha.format(now)
         );
+        PeriodoFacturacion p = new PeriodoFacturacion();
+        p.calcularPeriodo(new Date());
+        System.out.printf("Periodo de facturación por defecto: %s%n", p.getPeriodo());
 
-        GeneradorClientes genCli = new GeneradorClientes();
-        GeneradorPoblacion genPobl = new GeneradorPoblacion();
-        for(int i = 0; i<5; i++){
-            Poblacion poblacion = genPobl.getPoblacion();
-            String nombre = genCli.getNombre();
-            String apellido = genCli.getApellido();
-            int edad = genCli.getEdad();
-            String dni = genCli.getDNI();
-            System.out.printf(
-                    "%s %s %d %s%n\t%s %s (%s)%n",
-                    nombre, apellido, edad, dni,
-                    poblacion.getZipCode(), poblacion.getNombre(), poblacion.getProvince()
-            );
-        }
-
-
+        //Código interfaz consola.
         String menu = OpcionesMenu.getMenu();
         System.out.println(menu);
         Scanner scanner = new Scanner(System.in);
@@ -74,16 +89,17 @@ public class Main {
 
         switch(opcionMenu) {
             case ALTA_NUEVO_CLIENTE:
-                //altaCliente();
+                Particular cliente = new Particular();
+
+                altaCliente(cliente);
                 break;
             case BAJA_CLIENTE:
                 //bajaCliente();
                 break;
         }
-
-        PeriodoFacturacion p = new PeriodoFacturacion();
-        p.calcularPeriodo(new Date());
-        System.out.printf("%s%n", p.getPeriodo());
     }
 
+    public static void altaCliente(Cliente cliente){
+
+    }
 }

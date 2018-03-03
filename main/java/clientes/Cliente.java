@@ -1,8 +1,8 @@
 package clientes;
 
 import interfaces.Fecha;
-import places.Direccion;
 import facturacion.Tarifa;
+import poblaciones.Poblacion;
 
 import java.util.Date;
 
@@ -14,7 +14,7 @@ public abstract class Cliente implements Fecha{
     private Tarifa tarifa;
     private String nombre;
     private String nif;
-    private Direccion direccion;
+    private Poblacion poblacion;
     private String correoElectronico;
     private Date fechaAlta;
 
@@ -23,16 +23,16 @@ public abstract class Cliente implements Fecha{
         tarifa = null;
         nombre = "";
         nif = "";
-        direccion = null;
+        poblacion = null;
         correoElectronico = "";
         fechaAlta = null;
     }
 
-    public Cliente(Tarifa tarifa, String nombre, String nif, Direccion direccion, String correoElectronico){
+    public Cliente(Tarifa tarifa, String nombre, String nif, Poblacion poblacion, String correoElectronico){
         this.tarifa = tarifa;
         this.nombre = nombre;
         this.nif = nif;
-        this.direccion = direccion;
+        this.poblacion = poblacion;
         this.correoElectronico = correoElectronico;
         fechaAlta = new Date();
     }

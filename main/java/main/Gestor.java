@@ -41,6 +41,8 @@ public class Gestor {
         return null;
     }
 
-
+    public void altaCliente(Cliente cliente){
+        //cliente.getDatos();
+    }
 
 }

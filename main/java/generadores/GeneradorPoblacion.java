@@ -1,11 +1,7 @@
 package generadores;
 
-import places.Poblacion;
+import poblaciones.Poblacion;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -18,68 +14,37 @@ public class GeneradorPoblacion extends  Generador{
     //Constructores
     public GeneradorPoblacion(){
         listaCodPost = new ArrayList<String>();
-        provincias = leeFicheroProvincias();
-        poblaciones = leeFicheroLocalidades();
+        provincias = new HashMap<String, String>();
+        llenarDatos(PROVINCIAS);
+        poblaciones = new HashMap<String, Poblacion>();
+        llenarDatos(LOCALIDADES);
     }
 
-    protected HashMap<String , String> leeFicheroProvincias() {
-        HashMap<String, String> entidades =  new HashMap<String, String>();
-        try {
-            FileReader file = new FileReader(RUTA + PROVINCIAS + ".dat");
-            BufferedReader buffer = new BufferedReader(file);
-            String id = "";
-            String toponym = "";
-            String line = "";
-            while ((line = buffer.readLine()) != null) {
-                if (line.startsWith("#"))
-                    continue;
-
-                String tokens[] = line.split("\t");
-
+    @Override
+    protected void llenarDatos(String nombreFichero) {
+        ArrayList<String> lista = leerFichero(nombreFichero);
+        String id = "", toponym = "";
+        if (nombreFichero.equals(PROVINCIAS)) {
+            for (String linea : lista) {
+                String tokens[] = linea.split("\t");
                 id = tokens[0];
                 toponym = tokens[1];
-                entidades.put(id, toponym);
+                provincias.put(id, toponym);
             }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return entidades;
-    }
-
-    protected HashMap<String , Poblacion> leeFicheroLocalidades() {
-        HashMap<String, Poblacion> entidades =  new HashMap<String, Poblacion>();
-        try {
-            FileReader file = new FileReader(RUTA + LOCALIDADES + ".dat");
-            BufferedReader buffer = new BufferedReader(file);
-            String id = "";
-            String toponym = "";
-            String line = "";
-            while ((line = buffer.readLine()) != null) {
-                if (line.startsWith("#")) {
-                    continue;
-                }
-
-                String tokens[] = line.split("\t");
+        } else {
+            for (String linea : lista) {
+                String tokens[] = linea.split("\t");
 
                 id = tokens[0];
                 toponym = tokens[1];
                 Poblacion poblacion = new Poblacion();
-                poblacion.setName(toponym);
-                poblacion.setProvince(provincias.get(id.substring(0,2)));
-                poblacion.setZipCode(id);
-                entidades.put(id, poblacion);
+                poblacion.setNombre(toponym);
+                poblacion.setProvincia(provincias.get(id.substring(0, 2)));
+                poblacion.setCodigoPostal(id);
+                poblaciones.put(id, poblacion);
                 listaCodPost.add(id);
             }
-            buffer.close();
-            file.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
         }
-        return entidades;
     }
 
     public Poblacion getPoblacion(){
