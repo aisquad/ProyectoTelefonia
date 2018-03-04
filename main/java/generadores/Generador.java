@@ -43,6 +43,4 @@ public abstract class Generador {
         }
         return lista;
     }
-
-    protected abstract void llenarDatos(String nombreFichero);
 }

@@ -10,6 +10,7 @@ import java.util.Locale;
 import java.util.Scanner;
 
 import facturacion.PeriodoFacturacion;
+import generadores.GeneradorEmpresas;
 import generadores.GeneradorParticulares;
 import generadores.GeneradorPoblacion;
 import poblaciones.Poblacion;
@@ -56,6 +57,21 @@ public class Main {
             );
         }
 
+        GeneradorEmpresas empresa = new GeneradorEmpresas();
+        for (int i = 0; i<50; i++) {
+            Poblacion poblacion = genPobl.getPoblacion();
+            String nombre = genCli.getNombre();
+            String apellido = genCli.getApellido();
+            System.out.printf(
+                    "Empresa: %s %s %s%n\t%s %s (%s)%n",
+                    empresa.getAleatorio(poblacion),
+                    empresa.getCIF(),
+                    empresa.getEmail(nombre, apellido),
+                    poblacion.getCodigoPostal(),
+                    poblacion.getNombre(),
+                    poblacion.getProvincia()
+            );
+        }
         //Prueba manipulación fechas
         Date now = new Date();
         Long timestamp = now.getTime();
@@ -64,7 +80,7 @@ public class Main {
                 new Locale("es", "ES")
         );
         System.out.printf(
-                "\n\ntimestamp de now: %d(long)\nnow.toString(): %s\nnow en castellano: %s\n\n"
+                "%n%ntimestamp de now: %d(long)%nnow.toString(): %s%nnow en castellano: %s%n%n"
                 , timestamp, now.toString(),fecha.format(now)
         );
         PeriodoFacturacion p = new PeriodoFacturacion();
@@ -100,6 +116,6 @@ public class Main {
     }
 
     public static void altaCliente(Cliente cliente){
-
+        cliente.getFecha();
     }
 }

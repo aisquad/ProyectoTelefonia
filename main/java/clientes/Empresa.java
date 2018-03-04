@@ -11,7 +11,9 @@ public class Empresa extends Cliente{
     //Atributos
 
     //Constructores
-    public Empresa(){}
+    public Empresa(){
+        super();
+    }
 
     public Empresa(Tarifa tarifa, String nombre, String nif, Poblacion poblacion, String correoElectronico){
         super(tarifa, nombre, nif, poblacion, correoElectronico);

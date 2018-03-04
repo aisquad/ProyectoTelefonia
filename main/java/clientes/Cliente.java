@@ -41,4 +41,8 @@ public abstract class Cliente implements Fecha{
     public Date getFecha(){
         return fechaAlta;
     }
+
+    public void setPoblacion(Poblacion poblacion) {
+        this.poblacion = poblacion;
+    }
 }

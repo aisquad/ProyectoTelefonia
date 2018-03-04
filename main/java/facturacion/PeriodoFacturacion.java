@@ -9,7 +9,7 @@ public class PeriodoFacturacion {
     private Date inicioPeriodo;
     private Date finPeriodo;
     private SimpleDateFormat formatoFecha = new SimpleDateFormat(
-            "EEEE dd 'de' MMMM 'de' YYYY",
+            "EEEE d 'de' MMMM 'de' YYYY",
             new Locale("es", "ES")
     );
 
@@ -22,7 +22,13 @@ public class PeriodoFacturacion {
         inicioPeriodo = inicio;
         finPeriodo = fin;
     }
+
     public void calcularPeriodo(Date fecha){
+        /*
+        Método pensado para darle valores automáticamente al inicio y final
+        del periodo dependiendo de la fecha que se le pase. Asumimos que se
+        quiere facturar el periodo del mes anterior a la fecha que se le pasa.
+         */
         Calendar mesAnterior = Calendar.getInstance();
         Calendar calInicio = Calendar.getInstance();
         Calendar calFin = Calendar.getInstance();
