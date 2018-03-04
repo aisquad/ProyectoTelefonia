@@ -33,16 +33,6 @@ public class Main {
             );
         }
 
-        /*
-        Generador propio
-
-        Nuestro generador crea nombres de personas basado en la lista de admitidos en las
-        universidades de la Comunidad Valenciana del año 2016. Y genera un Cliente con nombre,
-        apellido, dni, email  (cosa que no hace el generador proporcionado por el profesor,
-        pero que se nos pide en el enunciado).
-
-        También escoge al 'azar' un municipio obteniendo su CP (ídem que email).
-         */
         System.out.println("\n\n\nEmpieza el muestreo de datos del generador propio.");
         GeneradorParticulares genCli = new GeneradorParticulares();
         GeneradorPoblacion genPobl = new GeneradorPoblacion();
@@ -57,8 +47,9 @@ public class Main {
             );
         }
 
+        System.out.println("\n");
         GeneradorEmpresas empresa = new GeneradorEmpresas();
-        for (int i = 0; i<50; i++) {
+        for (int i = 0; i<5; i++) {
             Poblacion poblacion = genPobl.getPoblacion();
             String nombre = genCli.getNombre();
             String apellido = genCli.getApellido();
@@ -94,7 +85,7 @@ public class Main {
         String usrinput = "";
         Integer opcion = 0;
         do {
-            System.out.print("Elije una opción: ");
+            System.out.print("Elige una opción: ");
             usrinput = scanner.next();
             if (!usrinput.equals("") && usrinput.matches("^\\d+$")) {
                 opcion = Integer.valueOf(usrinput);

@@ -13,7 +13,11 @@ public class GeneradorEmpresas extends GeneradorCliente {
             "Instalaciones", "Baños", "Cerámicas", "Fontanería", "Construcciones", "Inmobiliaria",
             "Arreglos y retales", "Colchones", "Mobiliario", "Peluquería", "Cooperativa Agricola",
             "Automóviles", "Reparaciones y Reformas", "Bar", "Restaurante", "Salón recreativo",
-            "Alimentación", "Casino", "Electricidad", "Academia"
+            "Alimentación", "Casino", "Electricidad", "Academia", "Clínicas Dentales", "Ordenadores",
+            "Relojería", "Joyería", "Bisutería", "Academia de Baile", "Sonido", "Electrodomésticos",
+            "Laboratorios", "Fotografía", "Comidas y Banquetes", "Catering", "Juguetes", "Viajes",
+            "Floristería", "Abogados", "Transportes", "Ofertas", "Buenos Precios", "Carpintería",
+            "Ferretería", "Ultramarinos", "Abacería", "Papelería", "Librería"
     };
     private Random random = new Random();
 
@@ -43,6 +47,9 @@ public class GeneradorEmpresas extends GeneradorCliente {
             match.find();
             nombreNegocio += match.group(0);
         }
+        String fiscalidad [] = {"CB", "SL", "SLU", "SAU", "SA"};
+        int alea = random.nextInt(fiscalidad.length);
+        nombreNegocio += String.format(" %s", fiscalidad[alea]);
         return nombreNegocio.toUpperCase();
     }
 
@@ -111,7 +118,7 @@ public class GeneradorEmpresas extends GeneradorCliente {
         int iDigits = dDigits.intValue();
         int numA = calculaA(numeroCIF);
         int numB = calculaB(numeroCIF);
-        int numC = (numA + numB) % 10;
+        int numC = 10 - ((numA + numB) % 10);
         return String.format("B%07d%d", numeroCIF, numC);
     }
 }
