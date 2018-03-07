@@ -66,11 +66,26 @@ public class Gestor {
 
     //Metodos relacionados con las llamdas
 
-    public boolean altaLlamada(String nif, String telefono, int duracion) {
+    public boolean insertarLlamada(String nif, String telefono, int duracion) {
         Cliente cliente = clientes.get(nif);
         if (cliente==null)
             return false;
         Llamada llamada = new Llamada(telefono, duracion, cliente);
+        ArrayList listaLlamadasCliente = llamadas.get(nif);
+        if (listaLlamadasCliente==null) {
+            listaLlamadasCliente = new ArrayList();
+            llamadas.put(nif, listaLlamadasCliente);
+        }
+        listaLlamadasCliente.add(llamada);
+        return true;
+    }
+
+    public boolean insertarLlamada(Date fecha, String nif, String telefono, int duracion) {
+        Cliente cliente = clientes.get(nif);
+        if (cliente==null)
+            return false;
+        Llamada llamada = new Llamada(telefono, duracion, cliente);
+        llamada.setFecha(fecha);
         ArrayList listaLlamadasCliente = llamadas.get(nif);
         if (listaLlamadasCliente==null) {
             listaLlamadasCliente = new ArrayList();
@@ -87,7 +102,7 @@ public class Gestor {
 
     //Metodos relacionados con las facturas
 
-    public boolean emitirFactura(String nif ) {
+    public boolean emitirFactura(String nif) {
         Cliente cliente = clientes.get(nif);
         ArrayList<Llamada> llamadasTotales = llamadas.get(nif);
         if(cliente == null && llamadasTotales == null)

@@ -3,19 +3,18 @@ package main;
 import clientes.Cliente;
 import clientes.Empresa;
 import clientes.Particular;
-import es.uji.belfern.generador.GeneradorDatosINE;
 
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
 import facturacion.Factura;
 import facturacion.Llamada;
-import facturacion.PeriodoFacturacion;
 import facturacion.Tarifa;
 import generadores.GeneradorEmpresas;
 import generadores.GeneradorParticulares;
 import generadores.GeneradorPoblacion;
-import kotlin.reflect.jvm.internal.impl.descriptors.SourceFile;
 import poblaciones.Poblacion;
 
 /**
@@ -23,67 +22,13 @@ import poblaciones.Poblacion;
  */
 public class Main {
     private static Gestor gestor = new Gestor();
+    private static SimpleDateFormat formatoFecha = new SimpleDateFormat(
+            "EEEE d 'de' MMMM 'de' YYYY",
+            new Locale("es", "ES")
+    );
+
 
     public static void main(String args[]) {
-        //Generador profe
-        System.out.println("Datos proporcionados por el generador del profesorado.");
-        GeneradorDatosINE gen = new GeneradorDatosINE();
-        for (int i = 0; i < 5; i++) {
-            String provincia = gen.getProvincia();
-            String poblacion = gen.getPoblacion(provincia);
-
-            System.out.printf("%s %s %s %s %s%n\t%s (%s)%n", gen.getNombreHombre(),
-                    gen.getApellido(), gen.getApellido(), gen.getEdad(), gen.getNIF(),
-                    poblacion, provincia
-            );
-        }
-
-        System.out.println("\n\n\nEmpieza el muestreo de datos del generador propio.");
-        GeneradorParticulares genCli = new GeneradorParticulares();
-        GeneradorPoblacion genPobl = new GeneradorPoblacion();
-        for(int i = 0; i<5; i++){
-            Poblacion poblacion = genPobl.getPoblacion();
-            String nombre = genCli.getNombre();
-            String apellido =  genCli.getApellido();
-            System.out.printf(
-                    "%s %s %d %s %s%n\t%s %s (%s)%n",
-                    nombre, apellido, genCli.getEdad(), genCli.getDNI(), genCli.getEmail(nombre, apellido),
-                    poblacion.getCodigoPostal(), poblacion.getNombre(), poblacion.getProvincia()
-            );
-        }
-
-        System.out.println("\n");
-        GeneradorEmpresas empresa = new GeneradorEmpresas();
-        for (int i = 0; i<5; i++) {
-            Poblacion poblacion = genPobl.getPoblacion();
-            String nombre = genCli.getNombre();
-            String apellido = genCli.getApellido();
-            System.out.printf(
-                    "Empresa: %s %s %s%n\t%s %s (%s)%n",
-                    empresa.getAleatorio(poblacion),
-                    empresa.getCIF(),
-                    empresa.getEmail(nombre, apellido),
-                    poblacion.getCodigoPostal(),
-                    poblacion.getNombre(),
-                    poblacion.getProvincia()
-            );
-        }
-        //Prueba manipulación fechas
-        Date now = new Date();
-        Long timestamp = now.getTime();
-        SimpleDateFormat fecha = new SimpleDateFormat(
-                "EEEE dd 'de' MMMM 'de' YYYY",
-                new Locale("es", "ES")
-        );
-        System.out.printf(
-                "%n%ntimestamp de now: %d(long)%nnow.toString(): %s%nnow en castellano: %s%n%n"
-                , timestamp, now.toString(),fecha.format(now)
-        );
-        PeriodoFacturacion p = new PeriodoFacturacion();
-        p.calcularPeriodo(new Date());
-        System.out.printf("Periodo de facturación por defecto: %s%n", p.getPeriodo());
-
-        //Código interfaz consola.
         String menu = OpcionesMenu.getMenu();
         System.out.println(menu);
         Scanner scanner = new Scanner(System.in);
@@ -107,7 +52,7 @@ public class Main {
                 bajaCliente();
                 break;
             case MODIFICAR_TARIFA:
-                cambioTarifa();
+                cambiarTarifa();
                 break;
             case BUSCAR_CLIENTE:
                 buscarCliente();
@@ -116,7 +61,7 @@ public class Main {
                 listarClientes();
                 break;
             case ALTA_LLAMADA:
-                altaLlamada();
+                insertarLlamada();
                 break;
             case LISTAR_LLAMADAS:
                 listarLlamadasCliente();
@@ -176,11 +121,8 @@ public class Main {
     }
 
     public static void bajaCliente(){
-        System.out.print("Introduce el NIF del cliente a eliminar: ");
-        Scanner scanner = new Scanner(System.in);
-        System.out.println();
-        String usrinput = scanner.next();
-        boolean bool = gestor.bajaCliente(usrinput);
+        String nif = pideNIF();
+        boolean bool = gestor.bajaCliente(nif);
         if (bool) {
             System.out.println("El cliente se ha eliminado satisfactoriamente.");
         } else {
@@ -188,11 +130,8 @@ public class Main {
         }
     }
 
-    public static void cambioTarifa() {
-        System.out.print("Introduce el NIF del cliente: ");
-        Scanner scanner = new Scanner(System.in);
-        System.out.println();
-        String nif = scanner.next();
+    public static void cambiarTarifa() {
+        String nif = pideNIF();
 
         System.out.print("Introduce el importe de la nueva tarifa: ");
         Scanner scanner = new Scanner(System.in);
@@ -208,27 +147,24 @@ public class Main {
     }
 
     public static void buscarCliente() {
-        System.out.print("Introduce el NIF del cliente: ");
-        Scanner scanner = new Scanner(System.in);
-        System.out.println();
-        String nif = scanner.next();
+        String nif = pideNIF();
 
         Cliente cliente = gestor.buscarCliente(nif);
         if (cliente != null) {
             System.out.printf(
-                    "Datos del Cliente:\n" +
-                            "Nombre completo: %s\n" +
-                            "NIF: %s\n" +
-                            "Poblacion: %s\n" +
-                            "Correo electrónico: %s\n" +
-                            "Fecha de Alta: %s\n" +
-                            "Tarifa: %s",
-                    cliente.getNombreCompleto(),
-                    cliente.getNIF(),
-                    cliente.getPoblacion(),
-                    cliente.getEmail(),
-                    cliente.getFecha(),
-                    cliente.getTarifa().getTarifa()
+                "Datos del Cliente:\n" +
+                "Nombre completo: %s\n" +
+                "NIF: %s\n" +
+                "Poblacion: %s\n" +
+                "Correo electrónico: %s\n" +
+                "Fecha de Alta: %s\n" +
+                "Tarifa: %s",
+                cliente.getNombreCompleto(),
+                cliente.getNIF(),
+                cliente.getPoblacion(),
+                cliente.getEmail(),
+                formatoFecha.format(cliente.getFecha()),
+                cliente.getTarifa().getTarifa()
             );
         } else {
             System.out.println("No existe el cliente.");
@@ -246,17 +182,23 @@ public class Main {
 
     //Metodos para las llamadas
 
-    public static void altaLlamada(){
+    public static void insertarLlamada(){
+        System.out.println(
+            "Se va a generar un nuevo registro para una llamada.\n" +
+            "Si desea introducir manualmente una fecha introduzca 'N' a continuación: ");
+        Scanner resp = new Scanner(System.in);
+        System.out.println();
+
         Random random = new Random();
         String tlf = String.format("9%d" ,random.nextInt(99999999));
-        int duración = random.nextInt(9999);
+        int duracion = random.nextInt(9999);
 
-        System.out.print("Introduce el NIF del cliente: ");
-        Scanner scanner = new Scanner(System.in);
-        System.out.println();
-        String nif = scanner.next();
-
-        boolean bool = gestor.altaLlamada(nif, tlf, duración);
+        boolean bool = false;
+        if (resp.nextLine().equals("N"))
+            bool = gestor.insertarLlamada(pideFecha(), pideNIF(), tlf, duracion);
+        else {
+            bool = gestor.insertarLlamada(pideNIF(), tlf, duracion);
+        }
         if (bool) {
             System.out.println("Nueva llamada registrada.");
         } else {
@@ -265,24 +207,20 @@ public class Main {
     }
 
     public static void listarLlamadasCliente() {
-        System.out.print("Introduce el NIF del cliente: ");
-        Scanner scanner = new Scanner(System.in);
-        System.out.println();
-        String nif = scanner.next();
-
+        String nif = pideNIF();
         ArrayList<Llamada> llamadas = gestor.listarLlamadasCliente(nif);
-        System.out.println("Relación de llamadas del cliente con NIF: "+nif);
+        System.out.printf("Relación de llamadas del cliente con NIF: %s%n", nif);
         int i = 1;
         if(llamadas == null)
             System.out.println("No hay llamadas para este cliente");
         else {
             for(Llamada llamada : llamadas) {
                 System.out.printf(
-                        "%-3d.- Fecha: %s Tel.: %s Dur.: %d ",
-                        i++,
-                        llamada.getFecha(),
-                        llamada.getTelefono(),
-                        llamada.getDuracion()
+                    "%-3d.- Fecha: %s Tel.: %s Dur.: %d%n",
+                    i++,
+                    formatoFecha.format(llamada.getFecha()),
+                    llamada.getTelefono(),
+                    llamada.getDuracion()
                 );
             }
         }
@@ -291,16 +229,13 @@ public class Main {
     //Metodos para las facturas
 
     public static void emitirFactura() {
-        System.out.print("Introduce el NIF del cliente: ");
-        Scanner scanner = new Scanner(System.in);
-        System.out.println();
-        String nif = scanner.next();
-
-        boolean bool = gestor.emitirFactura();
-        if( bool )
+        String nif = pideNIF();
+        boolean bool = gestor.emitirFactura(nif);
+        if (bool) {
             System.out.printf("Se ha emitido la factura del cliente %s satisfactoriamente", nif);
-        else
+        } else {
             System.out.println("No se ha podido emitir la factura");
+        }
     }
 
     public static void obtenerFactura() {
@@ -310,44 +245,55 @@ public class Main {
         int codigo = scanner.nextInt();
 
         Factura factura = gestor.obtenerFactura(codigo);
-        System.out.printf("Datos de la factura con el código %010d: \n", codigo);
-        System.out.printf("Fecha Emisión: %s \n" +
-                "Periodo de Facturación: %s \n" +
-                "Importe: %f euros \n" +
-                "Nombre Completo del cliente: %s \n" +
-                "NIF del cliente: %s",
-                factura.getFecha(),
-                factura.getPeriodoDeFacturacion().getPeriodo(),
-                factura.getImporte(),
-                factura.getCliente().getNombreCompleto(),
-                factura.getCliente().getNIF()
-                );
+        System.out.printf("Datos de la factura con el código %010d:%n", codigo);
+        mostrarFactura(factura, 1);
     }
 
     public static void listarFacturasCliente(){
-        System.out.print("Introduce el NIF del cliente: ");
-        Scanner scanner = new Scanner(System.in);
-        System.out.println();
-        String nif = scanner.next();
-
+        String nif = pideNIF();
         ArrayList<Factura> facturas = gestor.listarFacturasCliente(nif);
         int i =1;
-        System.out.printf("Listado de las facturas del cliente %s", nif);
+        System.out.printf("Listado de las facturas del cliente %s%n", nif);
         for(Factura factura : facturas){
-            System.out.printf("%-3d.- id Factura: %d\n" +
-                    "Fecha Emision: %s\n" +
-                    "Periodo de Facturación: %s \n" +
-                    "Importe: %f euros \n" +
-                    "Nombre Completo del cliente: %s \n" +
-                    "NIF del cliente: %s",
-                    i,
-                    factura.getIdFactura(),
-                    factura.getFecha(),
-                    factura.getPeriodoDeFacturacion().getPeriodo(),
-                    factura.getImporte(),
-                    factura.getCliente().getNombreCompleto(),
-                    factura.getCliente().getNIF() );
+            mostrarFactura(factura, i++);
         }
     }
 
+    private static String pideDato(String frase) {
+        System.out.printf("Introduce %s: ", frase);
+        Scanner scanner = new Scanner(System.in);
+        System.out.println();
+        return scanner.next();
+    }
+    private static String pideNIF() {
+        return pideDato("el NIF del cliente");
+    }
+
+    private static Date pideFecha() {
+        Date fecha = new Date();
+        try {
+            String usrimput = pideDato("una fecha para la llamada con el formato 'dd/mm/aaaa'");
+            DateFormat format = new SimpleDateFormat("dd/mm/aa");
+            fecha = format.parse(usrimput);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return fecha;
+    }
+
+    private static void mostrarFactura(Factura fact, int indice) {
+        System.out.printf(
+                "%-3d.- Fecha Emisión: %s\n\t" +
+                "Periodo de Facturación: %s\n\t" +
+                "Importe: %.2f €\n\t" +
+                "Nombre Completo del cliente: %s \n\t" +
+                "NIF del cliente: %s\n",
+                indice,
+                formatoFecha.format(fact.getFecha()),
+                fact.getPeriodoDeFacturacion().getPeriodo(),
+                fact.getImporte(),
+                fact.getCliente().getNombreCompleto(),
+                fact.getCliente().getNIF()
+        );
+    }
 }

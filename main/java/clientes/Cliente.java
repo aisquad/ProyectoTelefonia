@@ -17,6 +17,7 @@ public abstract class Cliente implements Fecha{
     private Poblacion poblacion;
     private String correoElectronico;
     private Date fechaAlta;
+    private boolean activo; //Si se le da de baja es false
 
     //Contructor
     public Cliente (){
@@ -26,6 +27,7 @@ public abstract class Cliente implements Fecha{
         poblacion = null;
         correoElectronico = "";
         fechaAlta = null;
+        activo = true;
     }
 
     public Cliente(Tarifa tarifa, String nombre, String nif, Poblacion poblacion, String correoElectronico){
@@ -35,6 +37,7 @@ public abstract class Cliente implements Fecha{
         this.poblacion = poblacion;
         this.correoElectronico = correoElectronico;
         fechaAlta = new Date();
+        activo = true;
     }
 
     //Metodos
