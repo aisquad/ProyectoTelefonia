@@ -22,4 +22,8 @@ public class Particular extends Cliente {
         this.apellido = apellido;
     }
 
+    @Override
+    public String getNombreCompleto() {
+        return super.getNombreCompleto() + " " + apellido;
+    }
 }

@@ -3,6 +3,7 @@ package facturacion;
 import clientes.Cliente;
 import interfaces.Fecha;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -16,6 +17,7 @@ public class Factura implements Fecha {
     private PeriodoFacturacion periodoFacturacion;
     private Double importe;
     private Cliente cliente;
+    private ArrayList<Llamada> llamadas;
 
     //Constructores
     public Factura () {
@@ -24,22 +26,43 @@ public class Factura implements Fecha {
         periodoFacturacion = new PeriodoFacturacion();
         importe = 0d;
         cliente = null;
+        llamadas = new ArrayList<Llamada>();
     }
 
-    public Factura (Double importe, Cliente cliente) {
+    public Factura (Cliente cliente, ArrayList<Llamada> llamadas) {
         idFactura++;
         fechaEmision = new Date();
         periodoFacturacion.calcularPeriodo(fechaEmision);
-        this.importe = importe;
+        calcularImporte();
         this.cliente = cliente;
+        this.llamadas = llamadas;
     }
 
     //Metodos
-    public String getIdFactura(){
-        return String.format("%10d", idFactura);
+    public int getIdFactura(){
+        return idFactura;
     }
 
     public Date getFecha() {
         return fechaEmision;
+    }
+
+    public PeriodoFacturacion getPeriodoDeFacturacion() {
+        return periodoFacturacion;
+    }
+    public Double getImporte(){
+        return importe;
+    }
+
+    public Cliente getCliente() {
+        return cliente;
+    }
+
+    public void calcularImporte() {
+        int duracionTotal =0;
+        for(int i = 0 ; i < llamadas.size(); i++) {
+            duracionTotal += llamadas.get(i).getDuracion();
+        }
+        importe = duracionTotal * cliente.getTarifa().getTarifaDouble();
     }
 }

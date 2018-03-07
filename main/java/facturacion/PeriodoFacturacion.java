@@ -56,4 +56,12 @@ public class PeriodoFacturacion {
     public String getPeriodo() {
         return String.format("%s - %s", formatoFecha.format(inicioPeriodo), formatoFecha.format(finPeriodo));
     }
+
+    public Date getInicioPeriodo() {
+        return inicioPeriodo;
+    }
+
+    public Date getFinPeriodo() {
+        return finPeriodo;
+    }
 }

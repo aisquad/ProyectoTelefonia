@@ -13,7 +13,7 @@ public class Llamada implements Fecha{
     //Atributos
     private String numeroTelefono;
     private Date fechaInicio;
-    private long duracion;
+    private int duracion;
     private Cliente cliente;
 
     //Contructores
@@ -24,7 +24,7 @@ public class Llamada implements Fecha{
         cliente = null;
     }
 
-    public Llamada(String numeroTelefono, long duracion, Cliente cliente) {
+    public Llamada(String numeroTelefono, int duracion, Cliente cliente) {
         this.numeroTelefono = numeroTelefono;
         this.duracion = duracion;
         this.cliente = cliente;
@@ -34,4 +34,14 @@ public class Llamada implements Fecha{
     public Date getFecha() {
         return fechaInicio;
     }
+
+    public String getTelefono() {
+        return numeroTelefono;
+    }
+
+    public int getDuracion() {
+        return duracion;
+    }
+
+
 }

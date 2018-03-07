@@ -15,4 +15,13 @@ public class Tarifa {
     public  Tarifa(Double tarifa) {
         this.tarifa = tarifa;
     }
+
+    //Metodos
+    public String getTarifa() {
+        return String.format("%0.2d", tarifa);
+    }
+
+    public Double getTarifaDouble() {
+        return tarifa;
+    }
 }

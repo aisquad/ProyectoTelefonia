@@ -112,6 +112,8 @@ public class GeneradorEmpresas extends GeneradorCliente {
         utilizaría la siguiente relación:
         número obtenido ->		1	2	3	4	5	6	7	8	9	0
         código de control -> 	A 	B 	C 	D 	E 	F 	G 	H 	I 	J
+
+        fte: https://es.wikipedia.org/wiki/N%C3%BAmero_de_identificaci%C3%B3n_fiscal#C%C3%B3digo_de_control_para_otros_NIF
         */
         int numeroCIF = random.nextInt(9999999);
         Double dDigits = Math.log10(numeroCIF) + 1;

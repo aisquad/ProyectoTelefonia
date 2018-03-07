@@ -42,6 +42,30 @@ public abstract class Cliente implements Fecha{
         return fechaAlta;
     }
 
+    public String getNIF() {
+        return nif;
+    }
+
+    public String getNombreCompleto() {
+        return nombre;
+    }
+
+    public String getPoblacion() {
+        return String.format("%s %s (%s)", poblacion.getCodigoPostal(), poblacion.getNombre(), poblacion.getProvincia());
+    }
+
+    public String getEmail() {
+        return correoElectronico;
+    }
+
+    public Tarifa getTarifa() {
+        return tarifa;
+    }
+
+    public void setTarifa(Tarifa tarifa) {
+        this.tarifa = tarifa;
+    }
+
     public void setPoblacion(Poblacion poblacion) {
         this.poblacion = poblacion;
     }
