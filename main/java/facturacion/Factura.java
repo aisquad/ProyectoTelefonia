@@ -4,7 +4,6 @@ import clientes.Cliente;
 import interfaces.Fecha;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -50,6 +49,7 @@ public class Factura implements Fecha {
     public PeriodoFacturacion getPeriodoDeFacturacion() {
         return periodoFacturacion;
     }
+
     public Double getImporte(){
         return importe;
     }
@@ -59,7 +59,7 @@ public class Factura implements Fecha {
     }
 
     public void calcularImporte() {
-        int duracionTotal =0;
+        int duracionTotal = 0;
         for(int i = 0 ; i < llamadas.size(); i++) {
             duracionTotal += llamadas.get(i).getDuracion();
         }

@@ -20,7 +20,7 @@ import poblaciones.Poblacion;
 /**
  * Created by al361930 on 20/02/18.
  */
-public class Main {
+public class Consola {
     private static Gestor gestor = new Gestor();
     private static SimpleDateFormat formatoFecha = new SimpleDateFormat(
             "EEEE d 'de' MMMM 'de' YYYY",
@@ -29,87 +29,107 @@ public class Main {
 
 
     public static void main(String args[]) {
-        String menu = OpcionesMenu.getMenu();
-        System.out.println(menu);
-        Scanner scanner = new Scanner(System.in);
-        String usrinput = "";
         Integer opcion = 0;
+        Integer max = 1000;
+        OpcionesMenu opcionMenu;
+        boolean salir = false;
         do {
-            System.out.print("Elige una opción: ");
-            usrinput = scanner.next();
-            if (!usrinput.equals("") && usrinput.matches("^\\d+$")) {
-                opcion = Integer.valueOf(usrinput);
-            }
-        } while (opcion  - 1 < 0 || opcion - 1 > OpcionesMenu.values().length);
-        OpcionesMenu opcionMenu = OpcionesMenu.getOpcion(opcion);
-        System.out.printf("Has elegido la opción: %s%n", opcionMenu.getDescripcion());
+            String menu = OpcionesMenu.getMenu();
+            System.out.println(menu);
+            Scanner scanner = new Scanner(System.in);
+            String usrinput = "";
+            /*
+            Únicamente aquí nos aseguramos que el dato introducido
+            es válido (es un entero dentro del rango del vector)
+            En el resto del código asumimos que el usuario inserta
+            valores que se ajustarán a las exigencias del script.
+            */
+            do {
+                System.out.print("Elige una opción: ");
+                usrinput = scanner.next();
+                if (!usrinput.equals("") && usrinput.matches("^\\d+$")) {
+                    opcion = Integer.valueOf(usrinput);
+                }
+            } while (opcion - 1 < 0 || opcion > OpcionesMenu.values().length);
+            opcionMenu = OpcionesMenu.getOpcion(opcion);
+            System.out.printf("Has elegido la opción: %s%n", opcionMenu.getDescripcion());
 
-        switch(opcionMenu) {
-            case ALTA_NUEVO_CLIENTE:
-                altaCliente();
-                break;
-            case BAJA_CLIENTE:
-                bajaCliente();
-                break;
-            case MODIFICAR_TARIFA:
-                cambiarTarifa();
-                break;
-            case BUSCAR_CLIENTE:
-                buscarCliente();
-                break;
-            case LISTAR_CLIENTES:
-                listarClientes();
-                break;
-            case ALTA_LLAMADA:
-                insertarLlamada();
-                break;
-            case LISTAR_LLAMADAS:
-                listarLlamadasCliente();
-                break;
-            case EMITIR_FATURA:
-                emitirFactura();
-                break;
-            case OBTENER_FACTURA:
-                obtenerFactura();
-                break;
-            case LISTAR_FACTURAS_CLIENTE:
-                listarFacturasCliente();
-                break;
-        }
+            switch (opcionMenu) {
+                case ALTA_NUEVO_CLIENTE:
+                    altaCliente();
+                    break;
+                case BAJA_CLIENTE:
+                    bajaCliente();
+                    break;
+                case MODIFICAR_TARIFA:
+                    cambiarTarifa();
+                    break;
+                case BUSCAR_CLIENTE:
+                    buscarCliente();
+                    break;
+                case LISTAR_CLIENTES:
+                    listarClientes();
+                    break;
+                case ALTA_LLAMADA:
+                    insertarLlamada();
+                    break;
+                case LISTAR_LLAMADAS:
+                    listarLlamadasCliente();
+                    break;
+                case EMITIR_FATURA:
+                    emitirFactura();
+                    break;
+                case OBTENER_FACTURA:
+                    obtenerFactura();
+                    break;
+                case LISTAR_FACTURAS_CLIENTE:
+                    listarFacturasCliente();
+                    break;
+                case SALIR:
+                    salir = true;
+                    break;
+            }
+            opcion = 0;
+            pideSeguir();
+        } while (!salir);
     }
 
     //Metodos para los clientes
 
     public static void altaCliente(){
-        System.out.print("El nuevo cliente será (P)articular o (E)mpresa?");
+        System.out.print("El nuevo cliente será (P)articular o (E)mpresa? ");
         Scanner scanner = new Scanner(System.in);
-        System.out.println();
         String usrinput = scanner.next();
+        System.out.println();
 
         GeneradorPoblacion genPobl = new GeneradorPoblacion();
         Poblacion poblacion = genPobl.getPoblacion();
         GeneradorParticulares genPart = new GeneradorParticulares();
+        /*
+        nombre y apellido nos hacen falta para el mail tanto de
+        particular como de empresa (en este último caso, por simplicidad).
+        */
         String nombre = genPart.getNombre();
         String apellido = genPart.getApellido();
         boolean bool;
         if(usrinput.equals("P")) {
             Particular particular = new Particular(
-                    new Tarifa(.2d),
-                    nombre,
-                    genPart.getDNI(),
-                    poblacion,
-                    genPart.getEmail(nombre, apellido),
-                    apellido
+                new Tarifa(.1d),
+                nombre,
+                genPart.getDNI(),
+                poblacion,
+                genPart.getEmail(nombre, apellido),
+                apellido
             );
             bool = gestor.altaNuevoCliente(particular);
         } else {
             GeneradorEmpresas genEmp = new GeneradorEmpresas();
             Empresa empresa = new Empresa(
-                    new Tarifa(.1d),
-                    genEmp.getAleatorio(poblacion),
-                    genEmp.getCIF(),
-                    poblacion,
-                    genEmp.getEmail(nombre, apellido)
+                new Tarifa(.2d),
+                genEmp.getAleatorio(poblacion),
+                genEmp.getCIF(),
+                poblacion,
+                genEmp.getEmail(nombre, apellido)
             );
             bool = gestor.altaNuevoCliente(empresa);
         }
@@ -133,6 +153,8 @@ public class Main {
     public static void cambiarTarifa() {
         String nif = pideNIF();
 
+        //Todo: Estaría permitido esto?
+        // Double importe = Double.valueOf(pideDato("el importe de la nueva tarifa"));
         System.out.print("Introduce el importe de la nueva tarifa: ");
         Scanner scanner = new Scanner(System.in);
         System.out.println();
@@ -176,7 +198,7 @@ public class Main {
         System.out.println("Listado de todos los clientes: \n");
         int i=1;
         for (Cliente cliente : clientes.values()){
-            System.out.printf("%-3d.- %s %s", i++, cliente.getNIF(), cliente.getNombreCompleto());
+            System.out.printf("%3d.- %s %s%n", i++, cliente.getNIF(), cliente.getNombreCompleto());
         }
     }
 
@@ -185,7 +207,8 @@ public class Main {
     public static void insertarLlamada(){
         System.out.println(
             "Se va a generar un nuevo registro para una llamada.\n" +
-            "Si desea introducir manualmente una fecha introduzca 'N' a continuación: ");
+            "Si desea introducir manualmente una fecha introduzca 'N' a continuación: "
+        );
         Scanner resp = new Scanner(System.in);
         System.out.println();
 
@@ -193,7 +216,7 @@ public class Main {
         String tlf = String.format("9%d" ,random.nextInt(99999999));
         int duracion = random.nextInt(9999);
 
-        boolean bool = false;
+        boolean bool;
         if (resp.nextLine().equals("N"))
             bool = gestor.insertarLlamada(pideFecha(), pideNIF(), tlf, duracion);
         else {
@@ -216,7 +239,7 @@ public class Main {
         else {
             for(Llamada llamada : llamadas) {
                 System.out.printf(
-                    "%-3d.- Fecha: %s Tel.: %s Dur.: %d%n",
+                    "%3d.- Fecha: %s Tel.: %s Dur.: %d%n",
                     i++,
                     formatoFecha.format(llamada.getFecha()),
                     llamada.getTelefono(),
@@ -259,12 +282,21 @@ public class Main {
         }
     }
 
+
+    private static void pideSeguir() {
+        System.out.print("\nPulsa [intro] para continuar");
+        Scanner scanner = new Scanner(System.in);
+        System.out.println();
+        scanner.nextLine();
+    }
+
     private static String pideDato(String frase) {
         System.out.printf("Introduce %s: ", frase);
         Scanner scanner = new Scanner(System.in);
         System.out.println();
         return scanner.next();
     }
+
     private static String pideNIF() {
         return pideDato("el NIF del cliente");
     }
@@ -273,7 +305,7 @@ public class Main {
         Date fecha = new Date();
         try {
             String usrimput = pideDato("una fecha para la llamada con el formato 'dd/mm/aaaa'");
-            DateFormat format = new SimpleDateFormat("dd/mm/aa");
+            DateFormat format = new SimpleDateFormat("dd/mm/aaaa");
             fecha = format.parse(usrimput);
         } catch (ParseException e) {
             e.printStackTrace();
@@ -283,10 +315,10 @@ public class Main {
 
     private static void mostrarFactura(Factura fact, int indice) {
         System.out.printf(
-                "%-3d.- Fecha Emisión: %s\n\t" +
+                "%3d.- Fecha Emisión: %s\n\t" +
                 "Periodo de Facturación: %s\n\t" +
                 "Importe: %.2f €\n\t" +
-                "Nombre Completo del cliente: %s \n\t" +
+                "Nombre Completo del cliente: %s\n\t" +
                 "NIF del cliente: %s\n",
                 indice,
                 formatoFecha.format(fact.getFecha()),

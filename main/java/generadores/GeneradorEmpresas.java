@@ -1,9 +1,7 @@
 package generadores;
 
-import clientes.Empresa;
 import poblaciones.Poblacion;
 
-import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -19,9 +17,9 @@ public class GeneradorEmpresas extends GeneradorCliente {
             "Floristería", "Abogados", "Transportes", "Ofertas", "Buenos Precios", "Carpintería",
             "Ferretería", "Ultramarinos", "Abacería", "Papelería", "Librería"
     };
-    private Random random = new Random();
 
     public GeneradorEmpresas() {
+        super();
     }
 
     private String eliminaDiacriticos(String string){

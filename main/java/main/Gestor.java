@@ -23,9 +23,10 @@ public class Gestor {
 
     //Contructores
     public Gestor() {
-        clientes = null;
-        facturas = null;
-        llamadas = null;
+        clientes = new HashMap<String, Cliente>();
+        facturas = new HashMap<Integer, Factura>();
+        facturasPorCliente = new HashMap<String, ArrayList<Factura>>();
+        llamadas = new HashMap<String, ArrayList<Llamada>>();
     }
 
     //Metodos

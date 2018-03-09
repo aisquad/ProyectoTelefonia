@@ -1,6 +1,9 @@
 package generadores;
 
 public class GeneradorCliente extends Generador {
+    public GeneradorCliente () {
+        super();
+    }
     private String eliminaDiacriticos(String string){
         string = string.replaceAll("[áàâä]", "a");
         string = string.replaceAll("ç", "c");
