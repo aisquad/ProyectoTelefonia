@@ -163,11 +163,11 @@ public class Consola {
 
         Tarifa tarifaAntigua =  gestor.cambiarTarifa(nif, importe);
         if (tarifaAntigua != null)
-            if (tarifaAntigua.getTarifaDouble().equals(importe))
+            if (tarifaAntigua.getTarifa().equals(importe))
                 System.out.printf(
                     "Se ha cambiado la tarifa del cliente con el NIF %s de %.2f a %.2f",
                     nif,
-                    tarifaAntigua.getTarifaDouble(),
+                    tarifaAntigua.getTarifa(),
                     importe
                 );
             else
@@ -194,7 +194,7 @@ public class Consola {
                 cliente.getPoblacion(),
                 cliente.getEmail(),
                 formatoFecha.format(cliente.getFecha()),
-                cliente.getTarifa().getTarifa()
+                cliente.getTarifa().getTarifaConFormato()
             );
         else
             System.out.println("No existe el cliente.");

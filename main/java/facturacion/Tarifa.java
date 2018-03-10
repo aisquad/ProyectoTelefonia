@@ -17,11 +17,11 @@ public class Tarifa {
     }
 
     //Metodos
-    public String getTarifa() {
-        return String.format("%0.2d", tarifa);
+    public Double getTarifa() {
+        return tarifa;
     }
 
-    public Double getTarifaDouble() {
-        return tarifa;
+    public String getTarifaConFormato() {
+        return String.format("%0.2f", tarifa);
     }
 }

@@ -19,7 +19,7 @@ public abstract class Cliente implements Fecha{
     private Date fechaAlta;
     //DONE: hay que cambiar el método eliminar para que conserve el cliente y cambie el atributo de activo a inactivo
     //No se puede perder un cliente si no queremos perder la facturación
-    private boolean activo; //Si se le da de baja es false
+    protected boolean activo; //Si se le da de baja es false
 
     //Contructor
     public Cliente (){
@@ -44,35 +44,43 @@ public abstract class Cliente implements Fecha{
 
     //Metodos
     public Date getFecha(){
-        return fechaAlta;
+        return activo ? fechaAlta : null;
     }
 
     public String getNIF() {
-        return nif;
+        return activo ? nif : "";
     }
 
     public String getNombreCompleto() {
-        return nombre;
+        return activo ? nombre : "";
     }
 
     public String getPoblacion() {
-        return String.format("%s %s (%s)", poblacion.getCodigoPostal(), poblacion.getNombre(), poblacion.getProvincia());
+        String rtn = "";
+        if (activo)
+            rtn = String.format(
+                "%s %s (%s)",
+                poblacion.getCodigoPostal(), poblacion.getNombre(), poblacion.getProvincia()
+            );
+        return rtn;
     }
 
     public String getEmail() {
-        return correoElectronico;
+        return activo ? correoElectronico : "";
     }
 
     public Tarifa getTarifa() {
-        return tarifa;
+        return activo ? tarifa : null;
     }
 
     public void setTarifa(Tarifa tarifa) {
-        this.tarifa = tarifa;
+        if (activo)
+            this.tarifa = tarifa;
     }
 
     public void setPoblacion(Poblacion poblacion) {
-        this.poblacion = poblacion;
+        if (activo)
+            this.poblacion = poblacion;
     }
 
     public void setActivo(boolean bool) {

@@ -17,5 +17,6 @@ public class Empresa extends Cliente{
 
     public Empresa(Tarifa tarifa, String nombre, String nif, Poblacion poblacion, String correoElectronico){
         super(tarifa, nombre, nif, poblacion, correoElectronico);
+        activo = true;
     }
 }

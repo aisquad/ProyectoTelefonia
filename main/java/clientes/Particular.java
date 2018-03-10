@@ -14,29 +14,33 @@ public class Particular extends Cliente {
     //Constr.
     public Particular () {
         super();
+        activo = true;
         apellido = "";
     }
 
     public Particular(Tarifa tarifa, String nombre, String nif, Poblacion poblacion, String correoElectronico, String apellido){
         super(tarifa, nombre, nif, poblacion, correoElectronico);
+        activo = true;
         this.apellido = apellido;
     }
 
     @Override
     public String getNombreCompleto() {
-        return super.getNombreCompleto() + " " + apellido;
+        return activo ? super.getNombreCompleto() + " " + apellido : "";
     }
 
     @Override
     public String toString() {
         String rtn = "";
-        rtn = String.format(
-            "%s %s %s, %s",
-            getNIF(),
-            this.getNombreCompleto(),
-            getEmail(),
-            getPoblacion()
-        );
+        if (activo) {
+            rtn = String.format(
+                "%s %s %s, %s",
+                getNIF(),
+                this.getNombreCompleto(),
+                getEmail(),
+                getPoblacion()
+            );
+        }
         return rtn;
     }
 }

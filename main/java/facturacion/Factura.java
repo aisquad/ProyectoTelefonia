@@ -69,7 +69,7 @@ public class Factura implements Fecha {
         int duracionTotal = 0;
         for(int i = 0 ; i < llamadas.size(); i++)
             duracionTotal += llamadas.get(i).getDuracion();
-        importe = duracionTotal * cliente.getTarifa().getTarifaDouble();
+        importe = duracionTotal * cliente.getTarifa().getTarifa();
     }
 
     public String toString() {
