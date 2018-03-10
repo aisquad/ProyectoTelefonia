@@ -3,12 +3,15 @@ package facturacion;
 import clientes.Cliente;
 import interfaces.Fecha;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Locale;
 
 /**
  * Created by al361930 on 27/02/18.
  */
+
 public class Factura implements Fecha {
     //Atributos
     private static int idFactura;
@@ -17,6 +20,10 @@ public class Factura implements Fecha {
     private Double importe;
     private Cliente cliente;
     private ArrayList<Llamada> llamadas;
+    private SimpleDateFormat formatoFecha = new SimpleDateFormat(
+        "EEEE d 'de' MMMM 'de' YYYY",
+        new Locale("es", "ES")
+    );
 
     //Constructores
     public Factura () {
@@ -60,9 +67,20 @@ public class Factura implements Fecha {
 
     public void calcularImporte() {
         int duracionTotal = 0;
-        for(int i = 0 ; i < llamadas.size(); i++) {
+        for(int i = 0 ; i < llamadas.size(); i++)
             duracionTotal += llamadas.get(i).getDuracion();
-        }
         importe = duracionTotal * cliente.getTarifa().getTarifaDouble();
+    }
+
+    public String toString() {
+        calcularImporte();
+        String rtn = "";
+        rtn = String.format(
+            "%05d %s %.2f",
+            idFactura,
+            formatoFecha.format(fechaEmision),
+            importe
+        );
+        return rtn;
     }
 }

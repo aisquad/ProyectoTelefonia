@@ -9,7 +9,6 @@ import facturacion.Tarifa;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Set;
 
 /**
  * Created by al361930 on 27/02/18.
@@ -17,14 +16,14 @@ import java.util.Set;
 public class Gestor {
     //Atributos
     private HashMap<String, Cliente> clientes;
-    private HashMap<Integer, Factura> facturas;
+    private HashMap<Integer, Factura> facturasPorCodigo;
     private HashMap<String, ArrayList<Factura>> facturasPorCliente;
     private HashMap<String, ArrayList<Llamada>> llamadas;
 
     //Contructores
     public Gestor() {
         clientes = new HashMap<String, Cliente>();
-        facturas = new HashMap<Integer, Factura>();
+        facturasPorCodigo = new HashMap<Integer, Factura>();
         facturasPorCliente = new HashMap<String, ArrayList<Factura>>();
         llamadas = new HashMap<String, ArrayList<Llamada>>();
     }
@@ -33,28 +32,27 @@ public class Gestor {
 
     //Metodos relacionados con los clientes
 
-    public boolean altaNuevoCliente(Cliente cliente) {
+    public Cliente altaNuevoCliente(Cliente cliente) {
         String nif = cliente.getNIF();
-        if (clientes.get(nif) != null)
-            return false;
         clientes.put(nif, cliente);
-        return true;
+        return cliente;
     }
 
-    public boolean bajaCliente(String nif){
-        if (clientes.get(nif) == null)
-            return false;
-        clientes.remove(nif);
-        return true;
-    }
-
-    public boolean cambioTarifa(String nif, Double importe) {
-        Tarifa nuevaTarifa = new Tarifa(importe);
+    public Cliente bajaCliente(String nif){
         Cliente cliente = clientes.get(nif);
-        if (cliente == null)
-            return false;
+        if (cliente != null)
+            cliente.setActivo(false);
+        return cliente;
+    }
+
+    public Tarifa cambiarTarifa(String nif, Double importe) {
+        Tarifa nuevaTarifa = new Tarifa(importe);
+        Tarifa tarifaAntigua = new Tarifa();
+        Cliente cliente = clientes.get(nif);
+        if (cliente != null)
+            tarifaAntigua = cliente.getTarifa();
         cliente.setTarifa(nuevaTarifa);
-        return true;
+        return tarifaAntigua;
     }
 
     public Cliente buscarCliente(String nif) {
@@ -97,17 +95,16 @@ public class Gestor {
     }
 
     public ArrayList<Llamada> listarLlamadasCliente(String nif) {
-        ArrayList<Llamada> aDevolver = llamadas.get(nif);
-        return aDevolver;
+        return  llamadas.get(nif);
     }
 
-    //Metodos relacionados con las facturas
+    //Metodos relacionados con las facturasPorCodigo
 
-    public boolean emitirFactura(String nif) {
+    public Factura emitirFactura(String nif) {
         Cliente cliente = clientes.get(nif);
         ArrayList<Llamada> llamadasTotales = llamadas.get(nif);
-        if(cliente == null && llamadasTotales == null)
-            return false;
+        if (cliente == null && llamadasTotales == null)
+            return null;
 
         ArrayList<Llamada> llamadasPeriodoFacturacion = new ArrayList<Llamada>();
         PeriodoFacturacion periodo = new PeriodoFacturacion();
@@ -116,24 +113,24 @@ public class Gestor {
         for(Llamada llamada : llamadasTotales){
             Date fechaEmision = llamada.getFecha();
             if (
-                    (fechaEmision.after(periodo.getInicioPeriodo()) || fechaEmision.equals(periodo.getInicioPeriodo()))
-                    && (fechaEmision.before(periodo.getFinPeriodo()) || fechaEmision.equals(periodo.getFinPeriodo()))){
-                llamadasPeriodoFacturacion.add(llamada);
+                (fechaEmision.after(periodo.getInicioPeriodo()) || fechaEmision.equals(periodo.getInicioPeriodo()))
+                && (fechaEmision.before(periodo.getFinPeriodo()) || fechaEmision.equals(periodo.getFinPeriodo())) ) {
+                    llamadasPeriodoFacturacion.add(llamada);
             }
         }
 
         Factura factura = new Factura(cliente, llamadasPeriodoFacturacion);
-        facturas.put(factura.getIdFactura(), factura);
-        ArrayList<Factura> lista =  facturasPorCliente.get(nif);
+        facturasPorCodigo.put(factura.getIdFactura(), factura);
+        ArrayList<Factura> lista = facturasPorCliente.get(nif);
         if(lista == null)
             lista = new ArrayList<Factura>();
         lista.add(factura);
 
-        return true;
+        return factura;
     }
 
     public Factura obtenerFactura(int codigo) {
-        return facturas.get(codigo);
+        return facturasPorCodigo.get(codigo);
     }
     public ArrayList<Factura> listarFacturasCliente(String nif) {
         return facturasPorCliente.get(nif);

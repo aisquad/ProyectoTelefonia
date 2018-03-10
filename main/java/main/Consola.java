@@ -30,7 +30,6 @@ public class Consola {
 
     public static void main(String args[]) {
         Integer opcion = 0;
-        Integer max = 1000;
         OpcionesMenu opcionMenu;
         boolean salir = false;
         do {
@@ -52,7 +51,6 @@ public class Consola {
                 }
             } while (opcion - 1 < 0 || opcion > OpcionesMenu.values().length);
             opcionMenu = OpcionesMenu.getOpcion(opcion);
-            System.out.printf("Has elegido la opción: %s%n", opcionMenu.getDescripcion());
 
             switch (opcionMenu) {
                 case ALTA_NUEVO_CLIENTE:
@@ -89,8 +87,11 @@ public class Consola {
                     salir = true;
                     break;
             }
-            opcion = 0;
-            pideSeguir();
+
+            if(!salir){
+                pideSeguir();
+                opcion = 0;
+            }
         } while (!salir);
     }
 
@@ -111,7 +112,7 @@ public class Consola {
         */
         String nombre = genPart.getNombre();
         String apellido = genPart.getApellido();
-        boolean bool;
+        Cliente cliente;
         if(usrinput.equals("P")) {
             Particular particular = new Particular(
                 new Tarifa(.1d),
@@ -121,7 +122,7 @@ public class Consola {
                 genPart.getEmail(nombre, apellido),
                 apellido
             );
-            bool = gestor.altaNuevoCliente(particular);
+            cliente = gestor.altaNuevoCliente(particular);
         } else {
             GeneradorEmpresas genEmp = new GeneradorEmpresas();
             Empresa empresa = new Empresa(
@@ -131,10 +132,10 @@ public class Consola {
                 poblacion,
                 genEmp.getEmail(nombre, apellido)
             );
-            bool = gestor.altaNuevoCliente(empresa);
+            cliente = gestor.altaNuevoCliente(empresa);
         }
-        if (bool) {
-            System.out.println("El cliente se ha añadido satisfactoriamente.");
+        if (cliente != null) {
+            System.out.printf("El cliente se ha añadido satisfactoriamente.\nNuevo cliente: " + cliente);
         } else {
             System.out.println("El cliente ya existía.");
         }
@@ -142,11 +143,11 @@ public class Consola {
 
     public static void bajaCliente(){
         String nif = pideNIF();
-        boolean bool = gestor.bajaCliente(nif);
-        if (bool) {
-            System.out.println("El cliente se ha eliminado satisfactoriamente.");
+        Cliente cliente = gestor.bajaCliente(nif);
+        if (cliente != null) {
+            System.out.println("El cliente se ha eliminado satisfactoriamente.\nCliente eliminado: "+ cliente);
         } else {
-            System.out.println("El cliente no existía.");
+            System.out.println("El cliente no existe.");
         }
     }
 
@@ -160,19 +161,26 @@ public class Consola {
         System.out.println();
         Double importe = scanner.nextDouble();
 
-       boolean bool =  gestor.cambioTarifa(nif, importe);
-        if (bool) {
-            System.out.printf("Se ha cambiado la tarifa del cliente con el NIF %s satisfactoriamente.", nif);
-        } else {
-            System.out.println("El cliente no existía.");
-        }
+        Tarifa tarifaAntigua =  gestor.cambiarTarifa(nif, importe);
+        if (tarifaAntigua != null)
+            if (tarifaAntigua.getTarifaDouble().equals(importe))
+                System.out.printf(
+                    "Se ha cambiado la tarifa del cliente con el NIF %s de %.2f a %.2f",
+                    nif,
+                    tarifaAntigua.getTarifaDouble(),
+                    importe
+                );
+            else
+                System.out.println("No se ha producido ningún cambio en la tarifa.");
+        else
+            System.out.println("El cliente no existe.");
     }
 
     public static void buscarCliente() {
         String nif = pideNIF();
 
         Cliente cliente = gestor.buscarCliente(nif);
-        if (cliente != null) {
+        if (cliente != null)
             System.out.printf(
                 "Datos del Cliente:\n" +
                 "Nombre completo: %s\n" +
@@ -188,14 +196,13 @@ public class Consola {
                 formatoFecha.format(cliente.getFecha()),
                 cliente.getTarifa().getTarifa()
             );
-        } else {
+        else
             System.out.println("No existe el cliente.");
-        }
     }
 
     public static void listarClientes() {
         HashMap<String , Cliente> clientes = gestor.listarClientes();
-        System.out.println("Listado de todos los clientes: \n");
+        System.out.println("Listado de todos los clientes:\n");
         int i=1;
         for (Cliente cliente : clientes.values()){
             System.out.printf("%3d.- %s %s%n", i++, cliente.getNIF(), cliente.getNombreCompleto());
@@ -217,7 +224,7 @@ public class Consola {
         int duracion = random.nextInt(9999);
 
         boolean bool;
-        if (resp.nextLine().equals("N"))
+        if (resp.nextLine().toUpperCase().equals("N"))
             bool = gestor.insertarLlamada(pideFecha(), pideNIF(), tlf, duracion);
         else {
             bool = gestor.insertarLlamada(pideNIF(), tlf, duracion);
@@ -236,8 +243,8 @@ public class Consola {
         int i = 1;
         if(llamadas == null)
             System.out.println("No hay llamadas para este cliente");
-        else {
-            for(Llamada llamada : llamadas) {
+        else
+            for(Llamada llamada : llamadas)
                 System.out.printf(
                     "%3d.- Fecha: %s Tel.: %s Dur.: %d%n",
                     i++,
@@ -245,17 +252,17 @@ public class Consola {
                     llamada.getTelefono(),
                     llamada.getDuracion()
                 );
-            }
-        }
     }
 
     //Metodos para las facturas
 
     public static void emitirFactura() {
         String nif = pideNIF();
-        boolean bool = gestor.emitirFactura(nif);
-        if (bool) {
-            System.out.printf("Se ha emitido la factura del cliente %s satisfactoriamente", nif);
+        Factura fact = gestor.emitirFactura(nif);
+        if (fact != null) {
+            System.out.printf(
+                "Se ha emitido la factura del cliente %s satisfactoriamente%nDatos factura: %s", nif, fact
+            );
         } else {
             System.out.println("No se ha podido emitir la factura");
         }
@@ -268,7 +275,7 @@ public class Consola {
         int codigo = scanner.nextInt();
 
         Factura factura = gestor.obtenerFactura(codigo);
-        System.out.printf("Datos de la factura con el código %010d:%n", codigo);
+        System.out.printf("Datos de la factura con el código %05d:%n", codigo);
         mostrarFactura(factura, 1);
     }
 
@@ -282,7 +289,7 @@ public class Consola {
         }
     }
 
-
+    //Otros métodos
     private static void pideSeguir() {
         System.out.print("\nPulsa [intro] para continuar");
         Scanner scanner = new Scanner(System.in);

@@ -17,6 +17,8 @@ public abstract class Cliente implements Fecha{
     private Poblacion poblacion;
     private String correoElectronico;
     private Date fechaAlta;
+    //DONE: hay que cambiar el método eliminar para que conserve el cliente y cambie el atributo de activo a inactivo
+    //No se puede perder un cliente si no queremos perder la facturación
     private boolean activo; //Si se le da de baja es false
 
     //Contructor
@@ -71,5 +73,25 @@ public abstract class Cliente implements Fecha{
 
     public void setPoblacion(Poblacion poblacion) {
         this.poblacion = poblacion;
+    }
+
+    public void setActivo(boolean bool) {
+        activo = bool;
+    }
+
+    @Override
+    public String toString() {
+        String rtn = "";
+        if (activo)
+            rtn = String.format(
+                "%s %s %s, %s",
+                getNIF(),
+                getNombreCompleto(),
+                getEmail(),
+                getPoblacion()
+            );
+        else
+            rtn = "<cliente eliminado>";
+        return rtn;
     }
 }

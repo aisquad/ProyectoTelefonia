@@ -26,4 +26,17 @@ public class Particular extends Cliente {
     public String getNombreCompleto() {
         return super.getNombreCompleto() + " " + apellido;
     }
+
+    @Override
+    public String toString() {
+        String rtn = "";
+        rtn = String.format(
+            "%s %s %s, %s",
+            getNIF(),
+            this.getNombreCompleto(),
+            getEmail(),
+            getPoblacion()
+        );
+        return rtn;
+    }
 }

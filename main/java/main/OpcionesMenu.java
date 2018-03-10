@@ -10,7 +10,7 @@ import interfaces.Descripcion;
  *   pertinentes al repecto.
  *
  * - TODO: Nos gustaría saber si hay alguna manera eficaz de mostrar en el menú algunas
- *   secciones como un apartado para "clients", otro para "llamadas" y otro para "facturas".
+ *   secciones como un apartado para "clientes", otro para "llamadas" y otro para "facturas".
  */
 public enum OpcionesMenu implements Descripcion, Apartado {
     /* CLIENTES */
