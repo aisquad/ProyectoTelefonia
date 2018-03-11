@@ -72,9 +72,10 @@ public class Factura implements Fecha {
         importe = duracionTotal * cliente.getTarifa().getTarifa();
     }
 
+    @Override
     public String toString() {
         calcularImporte();
-        String rtn = "";
+        String rtn;
         rtn = String.format(
             "%05d %s %.2f",
             idFactura,

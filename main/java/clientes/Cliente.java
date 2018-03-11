@@ -9,7 +9,7 @@ import java.util.Date;
 /**
  * Created by al361930 on 27/02/18.
  */
-public abstract class Cliente implements Fecha{
+public abstract class Cliente implements Fecha {
     //Atributos
     private Tarifa tarifa;
     private String nombre;
@@ -17,8 +17,7 @@ public abstract class Cliente implements Fecha{
     private Poblacion poblacion;
     private String correoElectronico;
     private Date fechaAlta;
-    //DONE: hay que cambiar el método eliminar para que conserve el cliente y cambie el atributo de activo a inactivo
-    //No se puede perder un cliente si no queremos perder la facturación
+
     protected boolean activo; //Si se le da de baja es false
 
     //Contructor
@@ -87,6 +86,10 @@ public abstract class Cliente implements Fecha{
         activo = bool;
     }
 
+    public boolean estadoActivo() {
+        return activo;
+    }
+
     @Override
     public String toString() {
         String rtn = "";
@@ -100,6 +103,25 @@ public abstract class Cliente implements Fecha{
             );
         else
             rtn = "<cliente eliminado>";
+        return rtn;
+    }
+
+    public String forzarDatos() {
+        /*
+        Modificamos temporalmente el atributo activo
+        para facilitar la extracción de datos que están
+        ocultos si el usuario está dado de baja (activo = false)
+         */
+        boolean temp = activo;
+        activo = true;
+        String rtn =  String.format(
+            "%s %s %s, %s",
+            getNIF(),
+            getNombreCompleto(),
+            getEmail(),
+            getPoblacion()
+        );
+        activo = temp;
         return rtn;
     }
 }

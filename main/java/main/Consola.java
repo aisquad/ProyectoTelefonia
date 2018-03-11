@@ -43,65 +43,83 @@ public class Consola {
             En el resto del código asumimos que el usuario inserta
             valores que se ajustarán a las exigencias del script.
             */
+            int veces = 1;
+            String datos = "";
             do {
                 System.out.print("Elige una opción: ");
                 usrinput = scanner.next();
                 if (!usrinput.equals("") && usrinput.matches("^\\d+$")) {
                     opcion = Integer.valueOf(usrinput);
+                } else if (usrinput.contains(":")) {
+                    String tokens[] = usrinput.split(":");
+                    opcion = Integer.valueOf(tokens[0]);
+                    veces = Integer.valueOf(tokens[1]);
+                    datos = tokens.length>2 ? tokens[2] : "";
                 }
             } while (opcion - 1 < 0 || opcion > OpcionesMenu.values().length);
             opcionMenu = OpcionesMenu.getOpcion(opcion);
 
-            switch (opcionMenu) {
-                case ALTA_NUEVO_CLIENTE:
-                    altaCliente();
-                    break;
-                case BAJA_CLIENTE:
-                    bajaCliente();
-                    break;
-                case MODIFICAR_TARIFA:
-                    cambiarTarifa();
-                    break;
-                case BUSCAR_CLIENTE:
-                    buscarCliente();
-                    break;
-                case LISTAR_CLIENTES:
-                    listarClientes();
-                    break;
-                case ALTA_LLAMADA:
-                    insertarLlamada();
-                    break;
-                case LISTAR_LLAMADAS:
-                    listarLlamadasCliente();
-                    break;
-                case EMITIR_FATURA:
-                    emitirFactura();
-                    break;
-                case OBTENER_FACTURA:
-                    obtenerFactura();
-                    break;
-                case LISTAR_FACTURAS_CLIENTE:
-                    listarFacturasCliente();
-                    break;
-                case SALIR:
-                    salir = true;
-                    break;
-            }
+            for (int i = 0; i < veces; i ++) {
+                switch (opcionMenu) {
+                    case ALTA_NUEVO_CLIENTE:
+                        altaCliente(datos);
+                        break;
+                    case BAJA_CLIENTE:
+                        bajaCliente();
+                        break;
+                    case MODIFICAR_TARIFA:
+                        cambiarTarifa();
+                        break;
+                    case BUSCAR_CLIENTE:
+                        buscarCliente();
+                        break;
+                    case LISTAR_CLIENTES:
+                        listarClientes();
+                        break;
+                    case ALTA_LLAMADA:
+                        insertarLlamada();
+                        break;
+                    case LISTAR_LLAMADAS:
+                        listarLlamadasCliente();
+                        break;
+                    case EMITIR_FATURA:
+                        emitirFactura();
+                        break;
+                    case OBTENER_FACTURA:
+                        obtenerFactura();
+                        break;
+                    case LISTAR_FACTURAS_CLIENTE:
+                        listarFacturasCliente();
+                        break;
+                    case SALIR:
+                        salir = true;
+                        break;
+                }
 
-            if(!salir){
-                pideSeguir();
-                opcion = 0;
+                if(!salir){
+                    //Si hemos introducido una sintaxis compleja, datos != "" y por lo tanto estamos
+                    //en modo 'automático'
+                    if (datos.equals("") || i == veces-1)
+                        pideSeguir();
+                    opcion = 0;
+                }
             }
         } while (!salir);
     }
 
     //Metodos para los clientes
 
-    public static void altaCliente(){
-        System.out.print("El nuevo cliente será (P)articular o (E)mpresa? ");
-        Scanner scanner = new Scanner(System.in);
-        String usrinput = scanner.next();
-        System.out.println();
+    public static void altaCliente(String datos){
+        String usrinput;
+        boolean manual = datos.equals("");
+        if (manual) {
+            System.out.print("El nuevo cliente será (P)articular o (E)mpresa? ");
+            Scanner scanner = new Scanner(System.in);
+            usrinput = scanner.next();
+            System.out.println();
+        } else {
+            usrinput = datos;
+        }
 
         GeneradorPoblacion genPobl = new GeneradorPoblacion();
         Poblacion poblacion = genPobl.getPoblacion();
@@ -135,7 +153,7 @@ public class Consola {
             cliente = gestor.altaNuevoCliente(empresa);
         }
         if (cliente != null) {
-            System.out.printf("El cliente se ha añadido satisfactoriamente.\nNuevo cliente: " + cliente);
+            System.out.printf("El cliente se ha añadido satisfactoriamente.\nNuevo cliente: %s%n", cliente);
         } else {
             System.out.println("El cliente ya existía.");
         }
@@ -145,7 +163,9 @@ public class Consola {
         String nif = pideNIF();
         Cliente cliente = gestor.bajaCliente(nif);
         if (cliente != null) {
-            System.out.println("El cliente se ha eliminado satisfactoriamente.\nCliente eliminado: "+ cliente);
+            System.out.println(
+                    "El cliente se ha eliminado satisfactoriamente.\nCliente eliminado: "+ cliente.forzarDatos()
+            );
         } else {
             System.out.println("El cliente no existe.");
         }
@@ -158,12 +178,12 @@ public class Consola {
         // Double importe = Double.valueOf(pideDato("el importe de la nueva tarifa"));
         System.out.print("Introduce el importe de la nueva tarifa: ");
         Scanner scanner = new Scanner(System.in);
-        System.out.println();
         Double importe = scanner.nextDouble();
+        System.out.println();
 
         Tarifa tarifaAntigua =  gestor.cambiarTarifa(nif, importe);
         if (tarifaAntigua != null)
-            if (tarifaAntigua.getTarifa().equals(importe))
+            if (!tarifaAntigua.getTarifa().equals(importe))
                 System.out.printf(
                     "Se ha cambiado la tarifa del cliente con el NIF %s de %.2f a %.2f",
                     nif,
@@ -180,7 +200,7 @@ public class Consola {
         String nif = pideNIF();
 
         Cliente cliente = gestor.buscarCliente(nif);
-        if (cliente != null)
+        if (cliente != null && cliente.estadoActivo())
             System.out.printf(
                 "Datos del Cliente:\n" +
                 "Nombre completo: %s\n" +
@@ -226,14 +246,13 @@ public class Consola {
         boolean bool;
         if (resp.nextLine().toUpperCase().equals("N"))
             bool = gestor.insertarLlamada(pideFecha(), pideNIF(), tlf, duracion);
-        else {
+        else
             bool = gestor.insertarLlamada(pideNIF(), tlf, duracion);
-        }
-        if (bool) {
+
+        if (bool)
             System.out.println("Nueva llamada registrada.");
-        } else {
+        else
             System.out.println("No se ha podido registrar la llamada.");
-        }
     }
 
     public static void listarLlamadasCliente() {
@@ -259,13 +278,12 @@ public class Consola {
     public static void emitirFactura() {
         String nif = pideNIF();
         Factura fact = gestor.emitirFactura(nif);
-        if (fact != null) {
+        if (fact != null)
             System.out.printf(
                 "Se ha emitido la factura del cliente %s satisfactoriamente%nDatos factura: %s", nif, fact
             );
-        } else {
+        else
             System.out.println("No se ha podido emitir la factura");
-        }
     }
 
     public static void obtenerFactura() {
@@ -284,9 +302,8 @@ public class Consola {
         ArrayList<Factura> facturas = gestor.listarFacturasCliente(nif);
         int i =1;
         System.out.printf("Listado de las facturas del cliente %s%n", nif);
-        for(Factura factura : facturas){
+        for(Factura factura : facturas)
             mostrarFactura(factura, i++);
-        }
     }
 
     //Otros métodos
@@ -322,17 +339,17 @@ public class Consola {
 
     private static void mostrarFactura(Factura fact, int indice) {
         System.out.printf(
-                "%3d.- Fecha Emisión: %s\n\t" +
-                "Periodo de Facturación: %s\n\t" +
-                "Importe: %.2f €\n\t" +
-                "Nombre Completo del cliente: %s\n\t" +
-                "NIF del cliente: %s\n",
-                indice,
-                formatoFecha.format(fact.getFecha()),
-                fact.getPeriodoDeFacturacion().getPeriodo(),
-                fact.getImporte(),
-                fact.getCliente().getNombreCompleto(),
-                fact.getCliente().getNIF()
+            "%3d.- Fecha Emisión: %s\n\t" +
+            "Periodo de Facturación: %s\n\t" +
+            "Importe: %.2f €\n\t" +
+            "Nombre Completo del cliente: %s\n\t" +
+            "NIF del cliente: %s\n",
+            indice,
+            formatoFecha.format(fact.getFecha()),
+            fact.getPeriodoDeFacturacion().getPeriodo(),
+            fact.getImporte(),
+            fact.getCliente().getNombreCompleto(),
+            fact.getCliente().getNIF()
         );
     }
 }

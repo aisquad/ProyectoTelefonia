@@ -15,12 +15,16 @@ import java.util.Scanner;
  * Created by al361930 on 27/02/18.
  */
 
-public class Llamada implements Fecha{
+public class Llamada implements Fecha {
     //Atributos
     private String numeroTelefono;
     private Date fechaInicio;
     private int duracion;
     private Cliente cliente;
+    private SimpleDateFormat formatoFecha = new SimpleDateFormat(
+            "EEEE d 'de' MMMM 'de' YYYY",
+            new Locale("es", "ES")
+    );
 
     //Contructores
     public Llamada () {
@@ -32,6 +36,7 @@ public class Llamada implements Fecha{
 
     public Llamada(String numeroTelefono, int duracion, Cliente cliente) {
         this.numeroTelefono = numeroTelefono;
+        fechaInicio = new Date();
         this.duracion = duracion;
         this.cliente = cliente;
         establecerFechaInicio();
@@ -43,7 +48,7 @@ public class Llamada implements Fecha{
         en el periodo de facturación del mes anterior.
 
         La otra solución es indicar qué fecha le queremos dar a la factura
-        mediante el método introducirFechaInicio(String fecha).
+        mediante el método insertarLlamada(fecha, ...) en el gestor.
         */
         Calendar cal = Calendar.getInstance();
         cal.setTime(fechaInicio);
@@ -65,6 +70,10 @@ public class Llamada implements Fecha{
 
     public void setFecha(Date fecha){
         fechaInicio = fecha;
+    }
+
+    public String toString() {
+        return String.format("%s %s %s s.", numeroTelefono, formatoFecha.format(fechaInicio), duracion);
     }
 
 }

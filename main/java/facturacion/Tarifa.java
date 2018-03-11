@@ -22,6 +22,6 @@ public class Tarifa {
     }
 
     public String getTarifaConFormato() {
-        return String.format("%0.2f", tarifa);
+        return String.format("%01.2f", tarifa);
     }
 }
