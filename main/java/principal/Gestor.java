@@ -1,4 +1,4 @@
-package main;
+package principal;
 
 import clientes.Cliente;
 import facturacion.Factura;
@@ -6,9 +6,7 @@ import facturacion.Llamada;
 import facturacion.PeriodoFacturacion;
 import facturacion.Tarifa;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
+import java.util.*;
 
 /**
  * Created by al361930 on 27/02/18.
@@ -65,10 +63,10 @@ public class Gestor {
 
     //Metodos relacionados con las llamdas
 
-    public boolean insertarLlamada(String nif, String telefono, int duracion) {
+    public Llamada insertarLlamada(String nif, String telefono, int duracion) {
         Cliente cliente = clientes.get(nif);
         if (cliente==null)
-            return false;
+            return null;
         Llamada llamada = new Llamada(telefono, duracion, cliente);
         ArrayList listaLlamadasCliente = llamadas.get(nif);
         if (listaLlamadasCliente==null) {
@@ -76,13 +74,13 @@ public class Gestor {
             llamadas.put(nif, listaLlamadasCliente);
         }
         listaLlamadasCliente.add(llamada);
-        return true;
+        return llamada;
     }
 
-    public boolean insertarLlamada(Date fecha, String nif, String telefono, int duracion) {
+    public Llamada insertarLlamada(Date fecha, String nif, String telefono, int duracion) {
         Cliente cliente = clientes.get(nif);
         if (cliente==null)
-            return false;
+            return null;
         Llamada llamada = new Llamada(telefono, duracion, cliente);
         llamada.setFecha(fecha);
         ArrayList listaLlamadasCliente = llamadas.get(nif);
@@ -91,7 +89,7 @@ public class Gestor {
             llamadas.put(nif, listaLlamadasCliente);
         }
         listaLlamadasCliente.add(llamada);
-        return true;
+        return llamada;
     }
 
     public ArrayList<Llamada> listarLlamadasCliente(String nif) {
@@ -132,9 +130,18 @@ public class Gestor {
     public Factura obtenerFactura(int codigo) {
         return facturasPorCodigo.get(codigo);
     }
+
     public ArrayList<Factura> listarFacturasCliente(String nif) {
         return facturasPorCliente.get(nif);
     }
 
-
+    public String escogeNIF(){
+        Random random = new Random();
+        Set<String> nifs = clientes.keySet();
+        for (String nif : nifs)
+            if (!clientes.get(nif).estadoActivo())
+                nifs.remove(nif);
+        String array[] = (String []) nifs.toArray();
+        return array[random.nextInt(array.length)];
+    }
 }

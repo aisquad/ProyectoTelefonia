@@ -1,4 +1,4 @@
-package interfaces;
+package tiempo;
 
 import java.util.Date;
 

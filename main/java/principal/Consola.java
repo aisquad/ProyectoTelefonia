@@ -1,4 +1,4 @@
-package main;
+package principal;
 
 import clientes.Cliente;
 import clientes.Empresa;
@@ -15,18 +15,17 @@ import facturacion.Tarifa;
 import generadores.GeneradorEmpresas;
 import generadores.GeneradorParticulares;
 import generadores.GeneradorPoblacion;
+import menu.OpcionesMenu;
 import poblaciones.Poblacion;
+import tiempo.SegundosATexto;
+import tiempo.FormateadorFecha;
 
 /**
  * Created by al361930 on 20/02/18.
  */
-public class Consola {
+public class Consola extends FormateadorFecha {
     private static Gestor gestor = new Gestor();
-    private static SimpleDateFormat formatoFecha = new SimpleDateFormat(
-            "EEEE d 'de' MMMM 'de' YYYY",
-            new Locale("es", "ES")
-    );
-
+    private static Random random = new Random();
 
     public static void main(String args[]) {
         Integer opcion = 0;
@@ -54,7 +53,7 @@ public class Consola {
                     String tokens[] = usrinput.split(":");
                     opcion = Integer.valueOf(tokens[0]);
                     veces = Integer.valueOf(tokens[1]);
-                    datos = tokens.length>2 ? tokens[2] : "";
+                    datos = tokens.length>2 ? tokens[2] : tokens.length>1 ? tokens[1] : "";
                 }
             } while (opcion - 1 < 0 || opcion > OpcionesMenu.values().length);
             opcionMenu = OpcionesMenu.getOpcion(opcion);
@@ -77,7 +76,7 @@ public class Consola {
                         listarClientes();
                         break;
                     case ALTA_LLAMADA:
-                        insertarLlamada();
+                        insertarLlamada(datos);
                         break;
                     case LISTAR_LLAMADAS:
                         listarLlamadasCliente();
@@ -98,7 +97,7 @@ public class Consola {
 
                 if(!salir){
                     //Si hemos introducido una sintaxis compleja, datos != "" y por lo tanto estamos
-                    //en modo 'automático'
+                    //en modo 'automático', solo hay que pedir pulsar intro al acabar el modo automático.
                     if (datos.equals("") || i == veces-1)
                         pideSeguir();
                     opcion = 0;
@@ -110,6 +109,11 @@ public class Consola {
     //Metodos para los clientes
 
     public static void altaCliente(String datos){
+        /*
+        Para generar varios clientes particulares:
+            1:10:P creará 10 particulares
+            1:5:E creará 5 empresas
+         */
         String usrinput;
         boolean manual = datos.equals("");
         if (manual) {
@@ -131,8 +135,8 @@ public class Consola {
         String nombre = genPart.getNombre();
         String apellido = genPart.getApellido();
         Cliente cliente;
-        if(usrinput.equals("P")) {
-            Particular particular = new Particular(
+        if(usrinput.equals("P"))
+            cliente = new Particular(
                 new Tarifa(.1d),
                 nombre,
                 genPart.getDNI(),
@@ -140,35 +144,33 @@ public class Consola {
                 genPart.getEmail(nombre, apellido),
                 apellido
             );
-            cliente = gestor.altaNuevoCliente(particular);
-        } else {
+        else {
             GeneradorEmpresas genEmp = new GeneradorEmpresas();
-            Empresa empresa = new Empresa(
-                new Tarifa(.2d),
-                genEmp.getAleatorio(poblacion),
-                genEmp.getCIF(),
-                poblacion,
-                genEmp.getEmail(nombre, apellido)
+            cliente = new Empresa(
+                    new Tarifa(.2d),
+                    genEmp.getAleatorio(poblacion),
+                    genEmp.getCIF(),
+                    poblacion,
+                    genEmp.getEmail(nombre, apellido)
             );
-            cliente = gestor.altaNuevoCliente(empresa);
         }
-        if (cliente != null) {
+        cliente = gestor.altaNuevoCliente(cliente);
+        if (cliente != null)
             System.out.printf("El cliente se ha añadido satisfactoriamente.\nNuevo cliente: %s%n", cliente);
-        } else {
+        else
             System.out.println("El cliente ya existía.");
-        }
     }
 
     public static void bajaCliente(){
         String nif = pideNIF();
         Cliente cliente = gestor.bajaCliente(nif);
-        if (cliente != null) {
+        if (cliente != null)
             System.out.println(
-                    "El cliente se ha eliminado satisfactoriamente.\nCliente eliminado: "+ cliente.forzarDatos()
+                "El cliente se ha eliminado satisfactoriamente.\nCliente eliminado: "+
+                cliente.mostrarDatosAnterioresABaja()
             );
-        } else {
+        else
             System.out.println("El cliente no existe.");
-        }
     }
 
     public static void cambiarTarifa() {
@@ -230,27 +232,57 @@ public class Consola {
     }
 
     //Metodos para las llamadas
+    private static int crearDuracion(){
+        /*
+        Generamos tres posibles tipos de llamadas, llamadas cortas, medianas y largas
+        las largas serán poco frecuentes, las media tendrán más posibilidades y las
+        cortas serán la más habituales para ello utilizamos un vector donde aparece
+        mayoritariamente un indice para llamadas cortas, unos pocos para media y menos
+        aun para largas.
+         1: cortas (>=300") +/- 5 min.;
+         2: medianas (>600") +/- 20 min.;
+         3: largas (> 7200") +/- 2 horas;
+         */
+        int vector[] = {
+                1, 1, 1, 2, 1, 1, 1, 2, 1, 1,
+                1, 2, 1, 1, 1, 1, 1, 1, 1, 1,
+                1, 1, 3, 1, 1, 2, 1, 1, 1, 1,
+                1, 2, 1, 1, 1, 1, 1, 1, 1, 1
+        };
+        int indice = vector[random.nextInt(vector.length)];
+        return random.nextInt(indice == 1 ? 300 : indice == 2 ? 1200 : 7200);
+    }
 
-    public static void insertarLlamada(){
-        System.out.println(
-            "Se va a generar un nuevo registro para una llamada.\n" +
-            "Si desea introducir manualmente una fecha introduzca 'N' a continuación: "
-        );
-        Scanner resp = new Scanner(System.in);
-        System.out.println();
+    private static String crearTelefono(){
+        int pref = new int[] {9, 9, 9, 6, 6, 6, 6, 6, 9, 9, 6, 6, 6, 8, 9, 6, 9, 6, 9, 6, 9}[random.nextInt(20)];
+        return String.format("%d%07d", pref, random.nextInt(99999999));
+    }
 
-        Random random = new Random();
-        String tlf = String.format("9%d" ,random.nextInt(99999999));
-        int duracion = random.nextInt(9999);
+    private static String escogeNIF() {
+        return gestor.escogeNIF();
+    }
 
-        boolean bool;
-        if (resp.nextLine().toUpperCase().equals("N"))
-            bool = gestor.insertarLlamada(pideFecha(), pideNIF(), tlf, duracion);
-        else
-            bool = gestor.insertarLlamada(pideNIF(), tlf, duracion);
+    public static void insertarLlamada(String datos){
+        Llamada llamada;
+        String telefono;
+        int duracion;
+        if (datos.equals("")) {
+            System.out.println("Se va a generar un nuevo registro para una llamada.");
+            telefono = pideDato("el numero de teléfono");
+            System.out.println("Introduzca la duración (en segundos -entre 1 y 7200-)");
+            Scanner resp = new Scanner(System.in);
+            System.out.println();
+            duracion = resp.nextInt();
+            llamada = gestor.insertarLlamada(pideFecha(), pideNIF(), telefono, duracion);
+        } else {
+            String nif = escogeNIF();
+            telefono = crearTelefono();
+            duracion = crearDuracion();
+            llamada = gestor.insertarLlamada(nif, telefono, duracion);
+        }
 
-        if (bool)
-            System.out.println("Nueva llamada registrada.");
+        if (llamada != null)
+            System.out.printf("Nueva llamada registrada. Datos de la llamada: %s.%n", llamada);
         else
             System.out.println("No se ha podido registrar la llamada.");
     }
@@ -265,11 +297,11 @@ public class Consola {
         else
             for(Llamada llamada : llamadas)
                 System.out.printf(
-                    "%3d.- Fecha: %s Tel.: %s Dur.: %d%n",
+                    "%3d.- Fecha: %s Tel.: %s Dur.: %s.%n",
                     i++,
                     formatoFecha.format(llamada.getFecha()),
                     llamada.getTelefono(),
-                    llamada.getDuracion()
+                    new SegundosATexto().segundosATextoAbreviado(llamada.getDuracion())
                 );
     }
 

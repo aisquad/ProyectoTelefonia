@@ -1,30 +1,23 @@
 package facturacion;
 
 import clientes.Cliente;
-import interfaces.Fecha;
+import tiempo.Fecha;
+import tiempo.FormateadorFecha;
+import tiempo.SegundosATexto;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Locale;
-import java.util.Scanner;
 
 /**
  * Created by al361930 on 27/02/18.
  */
 
-public class Llamada implements Fecha {
+public class Llamada extends FormateadorFecha implements Fecha {
     //Atributos
     private String numeroTelefono;
     private Date fechaInicio;
     private int duracion;
     private Cliente cliente;
-    private SimpleDateFormat formatoFecha = new SimpleDateFormat(
-            "EEEE d 'de' MMMM 'de' YYYY",
-            new Locale("es", "ES")
-    );
 
     //Contructores
     public Llamada () {
@@ -73,7 +66,12 @@ public class Llamada implements Fecha {
     }
 
     public String toString() {
-        return String.format("%s %s %s s.", numeroTelefono, formatoFecha.format(fechaInicio), duracion);
+        return String.format(
+            "%s %s, %s",
+            numeroTelefono,
+            formatoFecha.format(fechaInicio),
+            new SegundosATexto().segundosATextoAbreviado(duracion)
+        );
     }
 
 }

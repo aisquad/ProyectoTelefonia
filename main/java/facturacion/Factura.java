@@ -1,18 +1,17 @@
 package facturacion;
 
 import clientes.Cliente;
-import interfaces.Fecha;
+import tiempo.Fecha;
+import tiempo.FormateadorFecha;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Locale;
 
 /**
  * Created by al361930 on 27/02/18.
  */
 
-public class Factura implements Fecha {
+public class Factura extends FormateadorFecha implements Fecha {
     //Atributos
     private static int idFactura;
     private Date fechaEmision;
@@ -20,10 +19,6 @@ public class Factura implements Fecha {
     private Double importe;
     private Cliente cliente;
     private ArrayList<Llamada> llamadas;
-    private SimpleDateFormat formatoFecha = new SimpleDateFormat(
-        "EEEE d 'de' MMMM 'de' YYYY",
-        new Locale("es", "ES")
-    );
 
     //Constructores
     public Factura () {

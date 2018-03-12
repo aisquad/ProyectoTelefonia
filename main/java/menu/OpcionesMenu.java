@@ -1,7 +1,4 @@
-package main;
-
-import interfaces.Apartado;
-import interfaces.Descripcion;
+package menu;
 
 /**
  * Created by al361930 on 27/02/18.

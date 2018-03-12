@@ -1,6 +1,6 @@
 package clientes;
 
-import interfaces.Fecha;
+import tiempo.Fecha;
 import facturacion.Tarifa;
 import poblaciones.Poblacion;
 
@@ -106,11 +106,12 @@ public abstract class Cliente implements Fecha {
         return rtn;
     }
 
-    public String forzarDatos() {
+    public String mostrarDatosAnterioresABaja() {
         /*
-        Modificamos temporalmente el atributo activo
-        para facilitar la extracción de datos que están
-        ocultos si el usuario está dado de baja (activo = false)
+        Forzamos el muestreo de datos para ello modificamos
+        temporalmente el atributo activo para facilitar la
+        extracción de datos que están ocultos si el usuario
+        está dado de baja (activo = false)
          */
         boolean temp = activo;
         activo = true;

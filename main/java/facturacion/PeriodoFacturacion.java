@@ -1,17 +1,13 @@
 package facturacion;
 
-import java.text.SimpleDateFormat;
+import tiempo.FormateadorFecha;
+
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Locale;
 
-public class PeriodoFacturacion {
+public class PeriodoFacturacion extends FormateadorFecha {
     private Date inicioPeriodo;
     private Date finPeriodo;
-    private SimpleDateFormat formatoFecha = new SimpleDateFormat(
-            "EEEE d 'de' MMMM 'de' YYYY",
-            new Locale("es", "ES")
-    );
 
     public PeriodoFacturacion() {
         inicioPeriodo = new Date();
