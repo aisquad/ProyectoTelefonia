@@ -33,10 +33,11 @@ public class Factura extends FormateadorFecha implements Fecha {
     public Factura (Cliente cliente, ArrayList<Llamada> llamadas) {
         idFactura++;
         fechaEmision = new Date();
+        periodoFacturacion = new PeriodoFacturacion();
         periodoFacturacion.calcularPeriodo(fechaEmision);
-        calcularImporte();
         this.cliente = cliente;
         this.llamadas = llamadas;
+        calcularImporte();
     }
 
     //Metodos
@@ -58,6 +59,20 @@ public class Factura extends FormateadorFecha implements Fecha {
 
     public Cliente getCliente() {
         return cliente;
+    }
+
+    public ArrayList<Llamada> getLlamadas(){
+        return llamadas;
+    }
+
+    public void setPeriodoDeFacturacion(Date fecha) {
+        periodoFacturacion = new PeriodoFacturacion();
+        periodoFacturacion.calcularPeriodo(fecha);
+    }
+
+    public void setPeriodoDeFacturacion(PeriodoFacturacion periodo) {
+        periodoFacturacion = periodo;
+        calcularImporte();
     }
 
     public void calcularImporte() {

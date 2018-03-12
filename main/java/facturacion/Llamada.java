@@ -67,10 +67,11 @@ public class Llamada extends FormateadorFecha implements Fecha {
 
     public String toString() {
         return String.format(
-            "%s %s, %s",
-            numeroTelefono,
+            "%40s %14s %15s %5s €",
             formatoFecha.format(fechaInicio),
-            new SegundosATexto().segundosATextoAbreviado(duracion)
+            numeroTelefono,
+            new SegundosATexto().segundosATextoAbreviado(duracion),
+            String.format("%01.2f", cliente.getTarifa().getTarifa() * duracion)
         );
     }
 

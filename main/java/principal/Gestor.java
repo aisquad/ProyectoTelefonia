@@ -98,7 +98,7 @@ public class Gestor {
 
     //Metodos relacionados con las facturasPorCodigo
 
-    public Factura emitirFactura(String nif) {
+    public Factura emitirFactura(String nif, Date fecha) {
         Cliente cliente = clientes.get(nif);
         ArrayList<Llamada> llamadasTotales = llamadas.get(nif);
         if (cliente == null && llamadasTotales == null)
@@ -106,7 +106,7 @@ public class Gestor {
 
         ArrayList<Llamada> llamadasPeriodoFacturacion = new ArrayList<Llamada>();
         PeriodoFacturacion periodo = new PeriodoFacturacion();
-        periodo.calcularPeriodo(new Date());
+        periodo.calcularPeriodo(fecha);
 
         for(Llamada llamada : llamadasTotales){
             Date fechaEmision = llamada.getFecha();
@@ -118,10 +118,13 @@ public class Gestor {
         }
 
         Factura factura = new Factura(cliente, llamadasPeriodoFacturacion);
+        factura.setPeriodoDeFacturacion(fecha);
         facturasPorCodigo.put(factura.getIdFactura(), factura);
         ArrayList<Factura> lista = facturasPorCliente.get(nif);
-        if(lista == null)
+        if(lista == null) {
             lista = new ArrayList<Factura>();
+            facturasPorCliente.put(nif, lista);
+        }
         lista.add(factura);
 
         return factura;
@@ -135,13 +138,17 @@ public class Gestor {
         return facturasPorCliente.get(nif);
     }
 
-    public String escogeNIF(){
-        Random random = new Random();
+    public Object [] getClientes(){
         Set<String> nifs = clientes.keySet();
-        for (String nif : nifs)
+        for (String nif : clientes.keySet())
             if (!clientes.get(nif).estadoActivo())
                 nifs.remove(nif);
-        String array[] = (String []) nifs.toArray();
-        return array[random.nextInt(array.length)];
+        return nifs.toArray();
+    }
+
+    public String escogeNIF(){
+        Random random = new Random();
+        Object array[] = getClientes();
+        return (String) array[random.nextInt(array.length)];
     }
 }

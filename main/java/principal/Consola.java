@@ -11,6 +11,7 @@ import java.util.*;
 
 import facturacion.Factura;
 import facturacion.Llamada;
+import facturacion.PeriodoFacturacion;
 import facturacion.Tarifa;
 import generadores.GeneradorEmpresas;
 import generadores.GeneradorParticulares;
@@ -35,7 +36,7 @@ public class Consola extends FormateadorFecha {
             String menu = OpcionesMenu.getMenu();
             System.out.println(menu);
             Scanner scanner = new Scanner(System.in);
-            String usrinput = "";
+            String usrInput = "";
             /*
             Únicamente aquí nos aseguramos que el dato introducido
             es válido (es un entero dentro del rango del vector)
@@ -46,14 +47,18 @@ public class Consola extends FormateadorFecha {
             String datos = "";
             do {
                 System.out.print("Elige una opción: ");
-                usrinput = scanner.next();
-                if (!usrinput.equals("") && usrinput.matches("^\\d+$")) {
-                    opcion = Integer.valueOf(usrinput);
-                } else if (usrinput.contains(":")) {
-                    String tokens[] = usrinput.split(":");
+                usrInput = scanner.next();
+                if (!usrInput.equals("") && usrInput.matches("^\\d+$")) {
+                    opcion = Integer.valueOf(usrInput);
+                } else if (usrInput.contains(":")) {
+                    String tokens[] = usrInput.split(":");
                     opcion = Integer.valueOf(tokens[0]);
                     veces = Integer.valueOf(tokens[1]);
                     datos = tokens.length>2 ? tokens[2] : tokens.length>1 ? tokens[1] : "";
+                    if (opcion == 6 && veces > 0 && datos.equalsIgnoreCase("all")){
+                        datos = String.format("all:%d", veces);
+                        veces = 1;
+                    }
                 }
             } while (opcion - 1 < 0 || opcion > OpcionesMenu.values().length);
             opcionMenu = OpcionesMenu.getOpcion(opcion);
@@ -82,7 +87,7 @@ public class Consola extends FormateadorFecha {
                         listarLlamadasCliente();
                         break;
                     case EMITIR_FATURA:
-                        emitirFactura();
+                        emitirFactura(datos);
                         break;
                     case OBTENER_FACTURA:
                         obtenerFactura();
@@ -114,15 +119,15 @@ public class Consola extends FormateadorFecha {
             1:10:P creará 10 particulares
             1:5:E creará 5 empresas
          */
-        String usrinput;
+        String usrInput;
         boolean manual = datos.equals("");
         if (manual) {
             System.out.print("El nuevo cliente será (P)articular o (E)mpresa? ");
             Scanner scanner = new Scanner(System.in);
-            usrinput = scanner.next();
+            usrInput = scanner.next();
             System.out.println();
         } else {
-            usrinput = datos;
+            usrInput = datos;
         }
 
         GeneradorPoblacion genPobl = new GeneradorPoblacion();
@@ -135,9 +140,9 @@ public class Consola extends FormateadorFecha {
         String nombre = genPart.getNombre();
         String apellido = genPart.getApellido();
         Cliente cliente;
-        if(usrinput.equals("P"))
+        if(usrInput.equals("P"))
             cliente = new Particular(
-                new Tarifa(.1d),
+                new Tarifa(.001d),
                 nombre,
                 genPart.getDNI(),
                 poblacion,
@@ -147,7 +152,7 @@ public class Consola extends FormateadorFecha {
         else {
             GeneradorEmpresas genEmp = new GeneradorEmpresas();
             cliente = new Empresa(
-                    new Tarifa(.2d),
+                    new Tarifa(.002d),
                     genEmp.getAleatorio(poblacion),
                     genEmp.getCIF(),
                     poblacion,
@@ -255,30 +260,71 @@ public class Consola extends FormateadorFecha {
 
     private static String crearTelefono(){
         int pref = new int[] {9, 9, 9, 6, 6, 6, 6, 6, 9, 9, 6, 6, 6, 8, 9, 6, 9, 6, 9, 6, 9}[random.nextInt(20)];
-        return String.format("%d%07d", pref, random.nextInt(99999999));
+        return String.format("%d%08d", pref, random.nextInt(99999999));
     }
 
     private static String escogeNIF() {
         return gestor.escogeNIF();
     }
 
+    private static Date creaFecha() {
+        Date fecha = new Date();
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(fecha);
+        cal.add(Calendar.MONTH, -1);
+        int i = random.nextInt(9);
+        int positivo = random.nextInt(50);
+        if (positivo < 25) i = -i;
+        cal.add(Calendar.DAY_OF_MONTH, i);
+        return cal.getTime();
+    }
     public static void insertarLlamada(String datos){
-        Llamada llamada;
+        /*
+        Modo automático:
+            7:10:<DNI> -> genera 10 llamadas al DNI <DNI>.
+            7:15:All -> genera de 1 a 15 llamadas a cada uno de los clientes activos.
+         */
+        Llamada llamada = null;
         String telefono;
         int duracion;
         if (datos.equals("")) {
             System.out.println("Se va a generar un nuevo registro para una llamada.");
             telefono = pideDato("el numero de teléfono");
-            System.out.println("Introduzca la duración (en segundos -entre 1 y 7200-)");
+            System.out.println("Introduzca la duración (en segundos -entre 1 y 7200-): ");
             Scanner resp = new Scanner(System.in);
             System.out.println();
             duracion = resp.nextInt();
             llamada = gestor.insertarLlamada(pideFecha(), pideNIF(), telefono, duracion);
         } else {
-            String nif = escogeNIF();
+            String nif;
             telefono = crearTelefono();
             duracion = crearDuracion();
-            llamada = gestor.insertarLlamada(nif, telefono, duracion);
+            Date fecha = creaFecha();
+            if (datos.matches("^\\d+$")) {
+                //nos pasan el numero de iteraciones
+                nif = escogeNIF();
+                llamada = gestor.insertarLlamada(fecha, nif, telefono, duracion);
+            } else if (datos.matches("^[\\w\\d]\\d{7}[\\w\\d]$")){
+                //nos pasan un nif
+                nif = datos;
+                llamada = gestor.insertarLlamada(fecha, nif, telefono, duracion);
+            } else {
+                //nos pasan un número de iteraciones para todos
+                int veces, ttl = 0;
+                Object clientes[] = gestor.getClientes();
+                for (Object nif2 : clientes) {
+                    veces = random.nextInt(Integer.valueOf(datos.split(":")[1]));
+                    veces = veces < 3 ? 3 : veces;
+                    for (int i = 0; i < veces; i++) {
+                        llamada = gestor.insertarLlamada(creaFecha(), (String) nif2, crearTelefono(), crearDuracion());
+                        ttl++;
+                    }
+                }
+                System.out.printf(
+                        "Se han añadido %d llamadas entre %d clientes. Datos de última llamada añadida:%n",
+                        ttl, clientes.length
+                );
+            }
         }
 
         if (llamada != null)
@@ -307,9 +353,53 @@ public class Consola extends FormateadorFecha {
 
     //Metodos para las facturas
 
-    public static void emitirFactura() {
+    public static void emitirFactura(String datos) {
         String nif = pideNIF();
-        Factura fact = gestor.emitirFactura(nif);
+        Factura fact;
+        if (!datos.equals("")) {
+            //String mes = pideDato("el mes del periodo de facturación");
+
+            Calendar cal = Calendar.getInstance();
+            cal.set(Calendar.MONTH, Integer.parseInt(datos));
+            fact = gestor.emitirFactura(nif, cal.getTime());
+        } else {
+            System.out.print(
+                    "Para el periodo del mes anterior pusle [intro]." +
+                    "Para especificar un periodo teclee 'P' y a continuación " +
+                    "introduzca las dos fechas en las que se comprende el periodo.\n" +
+                    "Para un intervalo entre el primer y útlimo día de un mes " +
+                    "teclee 'I' y a continuación indique una única fecha." +
+                    "Las fechas deben tener el formato 'dd/mm/aaaa'."
+            );
+            Scanner scanner = new Scanner(System.in);
+            String usrInput = scanner.nextLine();
+            if (usrInput.equals(""))
+                fact = gestor.emitirFactura(nif, new Date());
+            else {
+                DateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+                try {
+                    if (usrInput.matches("(3[10]|[12]?\\\\d+)/(1[0-2]|[1-9])/20(1[0-8]|0\\d)")) {
+                        Date fecha = format.parse(usrInput);
+                        fact = gestor.emitirFactura(nif, new Date());
+                    } else {
+                        Date fecha1, fecha2;
+                        usrInput += usrInput.trim();
+                        usrInput.replace("  +", " ");
+                        String tokens[] = usrInput.split(" ");
+                        fecha1 = format.parse(tokens[0]);
+                        fecha2 = format.parse(tokens[1]);
+                        PeriodoFacturacion periodoFacturacion = new PeriodoFacturacion(fecha1, fecha2);
+                        fact = gestor.emitirFactura(nif, fecha1);
+                        fact.setPeriodoDeFacturacion(periodoFacturacion);
+
+                    }
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                    fact = null;
+                }
+            }
+        }
+
         if (fact != null)
             System.out.printf(
                 "Se ha emitido la factura del cliente %s satisfactoriamente%nDatos factura: %s", nif, fact
@@ -332,6 +422,10 @@ public class Consola extends FormateadorFecha {
     public static void listarFacturasCliente(){
         String nif = pideNIF();
         ArrayList<Factura> facturas = gestor.listarFacturasCliente(nif);
+        if (facturas == null) {
+            System.out.printf("No se han hallado coincidencias para el NIF %s.%n", nif);
+            return;
+        }
         int i =1;
         System.out.printf("Listado de las facturas del cliente %s%n", nif);
         for(Factura factura : facturas)
@@ -360,9 +454,9 @@ public class Consola extends FormateadorFecha {
     private static Date pideFecha() {
         Date fecha = new Date();
         try {
-            String usrimput = pideDato("una fecha para la llamada con el formato 'dd/mm/aaaa'");
-            DateFormat format = new SimpleDateFormat("dd/mm/aaaa");
-            fecha = format.parse(usrimput);
+            String usrInput = pideDato("una fecha para la llamada con el formato 'dd/mm/aaaa'");
+            DateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+            fecha = format.parse(usrInput);
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -373,15 +467,17 @@ public class Consola extends FormateadorFecha {
         System.out.printf(
             "%3d.- Fecha Emisión: %s\n\t" +
             "Periodo de Facturación: %s\n\t" +
-            "Importe: %.2f €\n\t" +
             "Nombre Completo del cliente: %s\n\t" +
             "NIF del cliente: %s\n",
             indice,
             formatoFecha.format(fact.getFecha()),
             fact.getPeriodoDeFacturacion().getPeriodo(),
-            fact.getImporte(),
             fact.getCliente().getNombreCompleto(),
             fact.getCliente().getNIF()
         );
+        for (Llamada llamada : fact.getLlamadas())
+            System.out.println("\t"+llamada);
+        System.out.printf("%72s  %s%n", " ", String.format("%09d", 0).replace("0", "-"));
+        System.out.printf("%72s: %7.2f €%n", "Importe", fact.getImporte());
     }
 }

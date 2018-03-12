@@ -11,6 +11,9 @@
     <properties>
         <junit.jupiter.version>5.0.3</junit.jupiter.version>
         <hamcrest.version>1.3</hamcrest.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>1.8</maven.compiler.source>
     </properties>
 
     <repositories>
@@ -30,8 +33,8 @@
         <dependency>
             <groupId>org.hamcrest</groupId>
             <artifactId>hamcrest-core</artifactId>
-            <version>1.3</version>
-            <scope>test</scope>
+            <version>${hamcrest.version}</version>
+            <!--scope>test</scope-->
         </dependency>
     </dependencies>
 
