@@ -2,10 +2,11 @@ package facturacion;
 
 import tiempo.FormateadorFecha;
 
+import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
 
-public class PeriodoFacturacion extends FormateadorFecha {
+public class PeriodoFacturacion extends FormateadorFecha implements Serializable {
     private Date inicioPeriodo;
     private Date finPeriodo;
 

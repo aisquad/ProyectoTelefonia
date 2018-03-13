@@ -1,9 +1,11 @@
 package facturacion;
 
+import java.io.Serializable;
+
 /**
  * Created by al361930 on 27/02/18.
  */
-public class Tarifa {
+public class Tarifa implements Serializable {
     //Atributos
     private double tarifa;
 

@@ -4,6 +4,7 @@ import clientes.Cliente;
 import tiempo.Fecha;
 import tiempo.FormateadorFecha;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -11,7 +12,7 @@ import java.util.Date;
  * Created by al361930 on 27/02/18.
  */
 
-public class Factura extends FormateadorFecha implements Fecha {
+public class Factura extends FormateadorFecha implements Serializable, Fecha {
     //Atributos
     private static int idFactura;
     private Date fechaEmision;

@@ -5,6 +5,7 @@ import tiempo.Fecha;
 import tiempo.FormateadorFecha;
 import tiempo.SegundosATexto;
 
+import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -12,7 +13,7 @@ import java.util.Date;
  * Created by al361930 on 27/02/18.
  */
 
-public class Llamada extends FormateadorFecha implements Fecha {
+public class Llamada extends FormateadorFecha implements Serializable, Fecha {
     //Atributos
     private String numeroTelefono;
     private Date fechaInicio;

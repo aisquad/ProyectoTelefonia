@@ -4,12 +4,13 @@ import tiempo.Fecha;
 import facturacion.Tarifa;
 import poblaciones.Poblacion;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * Created by al361930 on 27/02/18.
  */
-public abstract class Cliente implements Fecha {
+public abstract class Cliente implements Serializable, Fecha {
     //Atributos
     private Tarifa tarifa;
     private String nombre;
