@@ -54,7 +54,7 @@ public class Consola extends FormateadorFecha {
                     String tokens[] = usrInput.split(":");
                     opcion = Integer.valueOf(tokens[0]);
                     veces = Integer.valueOf(tokens[1]);
-                    datos = tokens.length>2 ? tokens[2] : tokens.length>1 ? tokens[1] : "";
+                    datos = tokens.length > 2 ? tokens[2] : tokens.length > 1 ? tokens[1] : "";
                     if (opcion == 6 && veces > 0 && datos.equalsIgnoreCase("all")){
                         datos = String.format("all:%d", veces);
                         veces = 1;
@@ -355,7 +355,7 @@ public class Consola extends FormateadorFecha {
 
     public static void emitirFactura(String datos) {
         String nif = pideNIF();
-        Factura fact;
+        Factura fact = null;
         if (!datos.equals("")) {
             //String mes = pideDato("el mes del periodo de facturación");
 
@@ -365,10 +365,10 @@ public class Consola extends FormateadorFecha {
         } else {
             System.out.print(
                     "Para el periodo del mes anterior pusle [intro]." +
-                    "Para especificar un periodo teclee 'P' y a continuación " +
+                    "Para especificar un periodo teclee 'P'\ny a continuación " +
                     "introduzca las dos fechas en las que se comprende el periodo.\n" +
                     "Para un intervalo entre el primer y útlimo día de un mes " +
-                    "teclee 'I' y a continuación indique una única fecha." +
+                    "teclee 'I'\ny a continuación indique una única fecha." +
                     "Las fechas deben tener el formato 'dd/mm/aaaa'."
             );
             Scanner scanner = new Scanner(System.in);
@@ -378,10 +378,14 @@ public class Consola extends FormateadorFecha {
             else {
                 DateFormat format = new SimpleDateFormat("dd/MM/yyyy");
                 try {
-                    if (usrInput.matches("(3[10]|[12]?\\\\d+)/(1[0-2]|[1-9])/20(1[0-8]|0\\d)")) {
-                        Date fecha = format.parse(usrInput);
-                        fact = gestor.emitirFactura(nif, new Date());
-                    } else {
+                    if (usrInput.equals("I")) {
+                        usrInput = scanner.nextLine();
+                        if (usrInput.matches("(3[10]|[12]?\\d+)/(1[0-2]|[1-9])/20(1[0-8]|0\\d)")) {
+                            Date fecha = format.parse(usrInput);
+                            fact = gestor.emitirFactura(nif, fecha);
+                        }
+                    } else if (usrInput.equals("P")){
+                        usrInput = scanner.nextLine();
                         Date fecha1, fecha2;
                         usrInput += usrInput.trim();
                         usrInput.replace("  +", " ");
@@ -391,12 +395,11 @@ public class Consola extends FormateadorFecha {
                         PeriodoFacturacion periodoFacturacion = new PeriodoFacturacion(fecha1, fecha2);
                         fact = gestor.emitirFactura(nif, fecha1);
                         fact.setPeriodoDeFacturacion(periodoFacturacion);
-
                     }
                 } catch (ParseException e) {
                     e.printStackTrace();
-                    fact = null;
                 }
+            scanner.close();
             }
         }
 
