@@ -55,8 +55,12 @@ public class Consola extends FormateadorFecha {
                     opcion = Integer.valueOf(tokens[0]);
                     veces = Integer.valueOf(tokens[1]);
                     datos = tokens.length > 2 ? tokens[2] : tokens.length > 1 ? tokens[1] : "";
-                    if (opcion == 6 && veces > 0 && datos.equalsIgnoreCase("all")){
-                        datos = String.format("all:%d", veces);
+                    if (opcion == 6 && veces > 0) {
+                        if (datos.equalsIgnoreCase("all")) {
+                            datos = String.format("all:%d", veces);
+                        } else {
+                            datos = String.format("around:%d", veces);
+                        }
                         veces = 1;
                     }
                 }
@@ -278,24 +282,40 @@ public class Consola extends FormateadorFecha {
         cal.add(Calendar.DAY_OF_MONTH, i);
         return cal.getTime();
     }
+
+    private static Date creaFecha(int i) {
+        Date fecha = new Date();
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(fecha);
+        cal.add(Calendar.MONTH, i);
+        int j = random.nextInt(9);
+        int positivo = random.nextInt(50);
+        if (positivo < 25) i = -j;
+        cal.add(Calendar.DAY_OF_MONTH, j);
+        return cal.getTime();
+    }
+
     public static void insertarLlamada(String datos){
-        /*
-        Modo automático:
-            7:10:<DNI> -> genera 10 llamadas al DNI <DNI>.
-            7:15:All -> genera de 1 a 15 llamadas a cada uno de los clientes activos.
-         */
         Llamada llamada = null;
         String telefono;
         int duracion;
         if (datos.equals("")) {
+            /*
+            Modo manual
+             */
             System.out.println("Se va a generar un nuevo registro para una llamada.");
             telefono = pideDato("el numero de teléfono");
-            System.out.println("Introduzca la duración (en segundos -entre 1 y 7200-): ");
+            System.out.print("Introduzca la duración (en segundos -entre 1 y 7200-): ");
             Scanner resp = new Scanner(System.in);
             System.out.println();
             duracion = resp.nextInt();
             llamada = gestor.insertarLlamada(pideFecha(), pideNIF(), telefono, duracion);
         } else {
+            /*
+            Modo automático:
+                7:10:<DNI> -> genera 10 llamadas al DNI <DNI>.
+                7:15:all -> genera de 1 a 15 llamadas a cada uno de los clientes activos.
+             */
             String nif;
             telefono = crearTelefono();
             duracion = crearDuracion();
@@ -308,8 +328,10 @@ public class Consola extends FormateadorFecha {
                 //nos pasan un nif
                 nif = datos;
                 llamada = gestor.insertarLlamada(fecha, nif, telefono, duracion);
-            } else {
-                //nos pasan un número de iteraciones para todos
+            } else if (datos.endsWith("all")) {
+                //nos pasan un número de iteraciones para todos los clientes, repetimos para
+                //mes actual -1, mes actual y mes actual+1
+
                 int veces, ttl = 0;
                 Object clientes[] = gestor.getClientes();
                 for (Object nif2 : clientes) {
@@ -321,9 +343,33 @@ public class Consola extends FormateadorFecha {
                     }
                 }
                 System.out.printf(
+                    "Se han añadido %d llamadas entre %d clientes. Datos de última llamada añadida:%n",
+                    ttl, clientes.length
+                );
+            } else {
+                //TODO: CODIGO REPETIDO
+                //nos pasan un número de iteraciones para todos los clientes, repetimos para
+                //mes actual -1, mes actual y mes actual+1
+
+                int veces, ttl = 0;
+                Object clientes[] = gestor.getClientes();
+                String split[] = datos.split(":");
+
+                int chars = Integer.valueOf(split[1]);
+                for (int i = -1; i < 2; i++)
+                    for (Object nif2 : clientes) {
+                        veces = random.nextInt(Integer.valueOf(chars));
+                        veces = veces < 3 ? 3 : veces;
+                        for (int j = 0; j < veces; j++) {
+                            llamada = gestor.insertarLlamada(creaFecha(i), (String) nif2, crearTelefono(), crearDuracion());
+                            ttl++;
+                        }
+                }
+                System.out.printf(
                         "Se han añadido %d llamadas entre %d clientes. Datos de última llamada añadida:%n",
                         ttl, clientes.length
                 );
+
             }
         }
 
@@ -357,19 +403,30 @@ public class Consola extends FormateadorFecha {
         String nif = pideNIF();
         Factura fact = null;
         if (!datos.equals("")) {
-            //String mes = pideDato("el mes del periodo de facturación");
+            /*
+            Modo automático:
+            8:01 -> emitir factura para mes de enero.
+             */
 
             Calendar cal = Calendar.getInstance();
             cal.set(Calendar.MONTH, Integer.parseInt(datos));
             fact = gestor.emitirFactura(nif, cal.getTime());
         } else {
-            System.out.print(
-                    "Para el periodo del mes anterior pusle [intro]." +
-                    "Para especificar un periodo teclee 'P'\ny a continuación " +
-                    "introduzca las dos fechas en las que se comprende el periodo.\n" +
-                    "Para un intervalo entre el primer y útlimo día de un mes " +
-                    "teclee 'I'\ny a continuación indique una única fecha." +
-                    "Las fechas deben tener el formato 'dd/mm/aaaa'."
+            /*
+            Modo manual, si no se especifica se asume que es para el periode del mes anterior a la
+            fecha actual.
+            También se puede especificar dos fechas para periodo comprendido entre esas fechas
+            O si solo se especifica una se creará el periodo (del dia 1 al último día del mes especificado).
+             */
+            System.out.println(
+                    "* Para el periodo del mes anterior pusle [intro].\n" +
+                    "* Para especificar un periodo teclee 'P'\n" +
+                    "  y a continuación introduzca las dos fechas en las\n" +
+                    "  que se comprende el periodo.\n" +
+                    "* Para un intervalo entre el primer y útlimo día de\n" +
+                    "  un mes teclee 'I' y a continuación indique una úni-" +
+                    "  ca fecha.\n" +
+                    "* Las fechas deben tener el formato 'dd/mm/aaaa'."
             );
             Scanner scanner = new Scanner(System.in);
             String usrInput = scanner.nextLine();
@@ -412,6 +469,7 @@ public class Consola extends FormateadorFecha {
     }
 
     public static void obtenerFactura() {
+        //TODO: Error si factura no existe
         System.out.print("Introduce el código de la factura: ");
         Scanner scanner = new Scanner(System.in);
         System.out.println();
