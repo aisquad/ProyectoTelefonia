@@ -1,6 +1,8 @@
 package poblaciones;
 
-public class Poblacion {
+import java.io.Serializable;
+
+public class Poblacion implements Serializable {
     //Atributes
     private String codigoPostal;
     private String nombre;

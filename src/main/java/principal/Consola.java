@@ -4,6 +4,7 @@ import clientes.Cliente;
 import clientes.Empresa;
 import clientes.Particular;
 
+import java.io.*;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -26,8 +27,9 @@ import tiempo.FormateadorFecha;
  * Created by al361930 on 20/02/18.
  */
 public class Consola extends FormateadorFecha {
-    private static Gestor gestor = new Gestor();
-    private static Random random = new Random();
+    private final String RUTA = "src/main/resources/data/";
+    private Gestor gestor = new Gestor();
+    private Random random = new Random();
 
     public static void main(String args[]) {
         new Consola().ejecuta();
@@ -59,8 +61,8 @@ public class Consola extends FormateadorFecha {
                     String tokens[] = usrInput.split(":");
                     opcion = Integer.valueOf(tokens[0]);
                     veces = Integer.valueOf(tokens[1]);
-                    datos = tokens.length>2 ? tokens[2] : tokens.length>1 ? tokens[1] : "";
-                    if (opcion == 6 && veces > 0 && datos.equalsIgnoreCase("all")){
+                    datos = tokens.length > 2 ? tokens[2] : tokens.length > 1 ? tokens[1] : "";
+                    if (opcion == 6 && veces > 0 && datos.equalsIgnoreCase("all")) {
                         datos = String.format("all:%d", veces);
                         veces = 1;
                     }
@@ -68,7 +70,7 @@ public class Consola extends FormateadorFecha {
             } while (opcion - 1 < 0 || opcion > OpcionesMenu.values().length);
             opcionMenu = OpcionesMenu.getOpcion(opcion);
 
-            for (int i = 0; i < veces; i ++) {
+            for (int i = 0; i < veces; i++) {
                 switch (opcionMenu) {
                     case ALTA_NUEVO_CLIENTE:
                         altaCliente(datos);
@@ -100,15 +102,19 @@ public class Consola extends FormateadorFecha {
                     case LISTAR_FACTURAS_CLIENTE:
                         listarFacturasCliente();
                         break;
+                    case CARGAR_DATOS:
+                        cargarDatos();
+                    case GUARDAR_DATOS:
+                        guardarDatos();
                     case SALIR:
                         salir = true;
                         break;
                 }
 
-                if(!salir){
+                if (!salir) {
                     //Si hemos introducido una sintaxis compleja, datos != "" y por lo tanto estamos
                     //en modo 'automático', solo hay que pedir pulsar intro al acabar el modo automático.
-                    if (datos.equals("") || i == veces-1)
+                    if (datos.equals("") || i == veces - 1)
                         pideSeguir();
                     opcion = 0;
                 }
@@ -118,7 +124,7 @@ public class Consola extends FormateadorFecha {
 
     //Metodos para los clientes
 
-    public void altaCliente(String datos){
+    public void altaCliente(String datos) {
         /*
         Para generar varios clientes particulares:
             1:10:P creará 10 particulares
@@ -145,14 +151,14 @@ public class Consola extends FormateadorFecha {
         String nombre = genPart.getNombre();
         String apellido = genPart.getApellido();
         Cliente cliente;
-        if(usrInput.equals("P"))
+        if (usrInput.equals("P"))
             cliente = new Particular(
-                new Tarifa(.001d),
-                nombre,
-                genPart.getDNI(),
-                poblacion,
-                genPart.getEmail(nombre, apellido),
-                apellido
+                    new Tarifa(.001d),
+                    nombre,
+                    genPart.getDNI(),
+                    poblacion,
+                    genPart.getEmail(nombre, apellido),
+                    apellido
             );
         else {
             GeneradorEmpresas genEmp = new GeneradorEmpresas();
@@ -171,13 +177,13 @@ public class Consola extends FormateadorFecha {
             System.out.println("El cliente ya existía.");
     }
 
-    public void bajaCliente(){
+    public void bajaCliente() {
         String nif = pideNIF();
         Cliente cliente = gestor.bajaCliente(nif);
         if (cliente != null)
             System.out.println(
-                "El cliente se ha eliminado satisfactoriamente.\nCliente eliminado: "+
-                cliente.mostrarDatosAnterioresABaja()
+                    "El cliente se ha eliminado satisfactoriamente.\nCliente eliminado: " +
+                            cliente.mostrarDatosAnterioresABaja()
             );
         else
             System.out.println("El cliente no existe.");
@@ -193,14 +199,14 @@ public class Consola extends FormateadorFecha {
         Double importe = scanner.nextDouble();
         System.out.println();
 
-        Tarifa tarifaAntigua =  gestor.cambiarTarifa(nif, importe);
+        Tarifa tarifaAntigua = gestor.cambiarTarifa(nif, importe);
         if (tarifaAntigua != null)
             if (!tarifaAntigua.getTarifa().equals(importe))
                 System.out.printf(
-                    "Se ha cambiado la tarifa del cliente con el NIF %s de %.2f a %.2f",
-                    nif,
-                    tarifaAntigua.getTarifa(),
-                    importe
+                        "Se ha cambiado la tarifa del cliente con el NIF %s de %.2f a %.2f",
+                        nif,
+                        tarifaAntigua.getTarifa(),
+                        importe
                 );
             else
                 System.out.println("No se ha producido ningún cambio en la tarifa.");
@@ -214,29 +220,29 @@ public class Consola extends FormateadorFecha {
         Cliente cliente = gestor.buscarCliente(nif);
         if (cliente != null && cliente.estadoActivo())
             System.out.printf(
-                "Datos del Cliente:\n" +
-                "Nombre completo: %s\n" +
-                "NIF: %s\n" +
-                "Poblacion: %s\n" +
-                "Correo electrónico: %s\n" +
-                "Fecha de Alta: %s\n" +
-                "Tarifa: %s",
-                cliente.getNombreCompleto(),
-                cliente.getNIF(),
-                cliente.getPoblacion(),
-                cliente.getEmail(),
-                formatoFecha.format(cliente.getFecha()),
-                cliente.getTarifa().getTarifaConFormato()
+                    "Datos del Cliente:\n" +
+                            "Nombre completo: %s\n" +
+                            "NIF: %s\n" +
+                            "Poblacion: %s\n" +
+                            "Correo electrónico: %s\n" +
+                            "Fecha de Alta: %s\n" +
+                            "Tarifa: %s",
+                    cliente.getNombreCompleto(),
+                    cliente.getNIF(),
+                    cliente.getPoblacion(),
+                    cliente.getEmail(),
+                    formatoFecha.format(cliente.getFecha()),
+                    cliente.getTarifa().getTarifaConFormato()
             );
         else
             System.out.println("No existe el cliente.");
     }
 
     public void listarClientes() {
-        HashMap<String , Cliente> clientes = gestor.listarClientes();
+        HashMap<String, Cliente> clientes = gestor.listarClientes();
         System.out.println("Listado de todos los clientes:\n");
-        int i=1;
-        for (Cliente cliente : clientes.values()){
+        int i = 1;
+        for (Cliente cliente : clientes.values()) {
             System.out.printf("%3d.- %s %s%n", i++, cliente.getNIF(), cliente.getNombreCompleto());
         }
     }
@@ -246,7 +252,7 @@ public class Consola extends FormateadorFecha {
         return gestor.escogeNIF();
     }
 
-    public void insertarLlamada(String datos){
+    public void insertarLlamada(String datos) {
         /*
         Modo automático:
             7:10:<DNI> -> genera 10 llamadas al DNI <DNI>.
@@ -273,7 +279,7 @@ public class Consola extends FormateadorFecha {
                 //nos pasan el numero de iteraciones
                 nif = escogeNIF();
                 llamada = gestor.insertarLlamada(fecha, nif, telefono, duracion);
-            } else if (datos.matches("^[\\w\\d]\\d{7}[\\w\\d]$")){
+            } else if (datos.matches("^[\\w\\d]\\d{7}[\\w\\d]$")) {
                 //nos pasan un nif
                 nif = datos;
                 llamada = gestor.insertarLlamada(fecha, nif, telefono, duracion);
@@ -309,16 +315,16 @@ public class Consola extends FormateadorFecha {
         ArrayList<Llamada> llamadas = gestor.listarLlamadasCliente(nif);
         System.out.printf("Relación de llamadas del cliente con NIF: %s%n", nif);
         int i = 1;
-        if(llamadas == null)
+        if (llamadas == null)
             System.out.println("No hay llamadas para este cliente");
         else
-            for(Llamada llamada : llamadas)
+            for (Llamada llamada : llamadas)
                 System.out.printf(
-                    "%3d.- Fecha: %s Tel.: %s Dur.: %s.%n",
-                    i++,
-                    formatoFecha.format(llamada.getFecha()),
-                    llamada.getTelefono(),
-                    new SegundosATexto().segundosATextoAbreviado(llamada.getDuracion())
+                        "%3d.- Fecha: %s Tel.: %s Dur.: %s.%n",
+                        i++,
+                        formatoFecha.format(llamada.getFecha()),
+                        llamada.getTelefono(),
+                        new SegundosATexto().segundosATextoAbreviado(llamada.getDuracion())
                 );
     }
 
@@ -336,11 +342,11 @@ public class Consola extends FormateadorFecha {
         } else {
             System.out.print(
                     "Para el periodo del mes anterior pusle [intro]." +
-                    "Para especificar un periodo teclee 'P' y a continuación " +
-                    "introduzca las dos fechas en las que se comprende el periodo.\n" +
-                    "Para un intervalo entre el primer y útlimo día de un mes " +
-                    "teclee 'I' y a continuación indique una única fecha." +
-                    "Las fechas deben tener el formato 'dd/mm/aaaa'."
+                            "Para especificar un periodo teclee 'P' y a continuación " +
+                            "introduzca las dos fechas en las que se comprende el periodo.\n" +
+                            "Para un intervalo entre el primer y útlimo día de un mes " +
+                            "teclee 'I' y a continuación indique una única fecha." +
+                            "Las fechas deben tener el formato 'dd/mm/aaaa'."
             );
             Scanner scanner = new Scanner(System.in);
             String usrInput = scanner.nextLine();
@@ -373,7 +379,7 @@ public class Consola extends FormateadorFecha {
 
         if (fact != null)
             System.out.printf(
-                "Se ha emitido la factura del cliente %s satisfactoriamente%nDatos factura: %s", nif, fact
+                    "Se ha emitido la factura del cliente %s satisfactoriamente%nDatos factura: %s", nif, fact
             );
         else
             System.out.println("No se ha podido emitir la factura");
@@ -390,16 +396,16 @@ public class Consola extends FormateadorFecha {
         mostrarFactura(factura, 1);
     }
 
-    public void listarFacturasCliente(){
+    public void listarFacturasCliente() {
         String nif = pideNIF();
         ArrayList<Factura> facturas = gestor.listarFacturasCliente(nif);
         if (facturas == null) {
             System.out.printf("No se han hallado coincidencias para el NIF %s.%n", nif);
             return;
         }
-        int i =1;
+        int i = 1;
         System.out.printf("Listado de las facturas del cliente %s%n", nif);
-        for(Factura factura : facturas)
+        for (Factura factura : facturas)
             mostrarFactura(factura, i++);
     }
 
@@ -436,19 +442,47 @@ public class Consola extends FormateadorFecha {
 
     private void mostrarFactura(Factura fact, int indice) {
         System.out.printf(
-            "%3d.- Fecha Emisión: %s\n\t" +
-            "Periodo de Facturación: %s\n\t" +
-            "Nombre Completo del cliente: %s\n\t" +
-            "NIF del cliente: %s\n",
-            indice,
-            formatoFecha.format(fact.getFecha()),
-            fact.getPeriodoDeFacturacion().getPeriodo(),
-            fact.getCliente().getNombreCompleto(),
-            fact.getCliente().getNIF()
+                "%3d.- Fecha Emisión: %s\n\t" +
+                        "Periodo de Facturación: %s\n\t" +
+                        "Nombre Completo del cliente: %s\n\t" +
+                        "NIF del cliente: %s\n",
+                indice,
+                formatoFecha.format(fact.getFecha()),
+                fact.getPeriodoDeFacturacion().getPeriodo(),
+                fact.getCliente().getNombreCompleto(),
+                fact.getCliente().getNIF()
         );
         for (Llamada llamada : fact.getLlamadas())
-            System.out.println("\t"+llamada);
+            System.out.println("\t" + llamada);
         System.out.printf("%72s  %s%n", " ", String.format("%09d", 0).replace("0", "-"));
         System.out.printf("%72s: %7.2f €%n", "Importe", fact.getImporte());
+    }
+
+    private void guardarDatos() {
+        FileOutputStream fos = null;
+        try {
+            fos = new FileOutputStream(RUTA + "gestor.bin");
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            oos.writeObject(gestor);
+            oos.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void cargarDatos() {
+        FileInputStream fis = null;
+        try {
+            fis = new FileInputStream(RUTA + "gestor.bin");
+            ObjectInputStream ois = new ObjectInputStream(fis);
+            gestor = (Gestor) ois.readObject();
+            ois.close();
+        } catch (FileNotFoundException | ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

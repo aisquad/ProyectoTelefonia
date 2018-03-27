@@ -6,12 +6,13 @@ import facturacion.Llamada;
 import facturacion.PeriodoFacturacion;
 import facturacion.Tarifa;
 
+import java.io.Serializable;
 import java.util.*;
 
 /**
  * Created by al361930 on 27/02/18.
  */
-public class Gestor {
+public class Gestor implements Serializable {
     //Atributos
     private HashMap<String, Cliente> clientes;
     private HashMap<Integer, Factura> facturasPorCodigo;

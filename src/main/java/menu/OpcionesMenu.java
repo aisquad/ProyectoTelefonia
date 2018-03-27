@@ -23,7 +23,9 @@ public enum OpcionesMenu implements Descripcion, Apartado {
     EMITIR_FATURA("Emisión Nueva Factura.", 3),
     OBTENER_FACTURA("Mostrar Factura por Código.", 3),
     LISTAR_FACTURAS_CLIENTE("Lista Facturas Cliente.", 3),
-    /* SALIR */
+    /* GENERALIDADES */
+    CARGAR_DATOS("Cargar datos", 4),
+    GUARDAR_DATOS("Guardar datos", 4),
     SALIR("Salir del programa.", 4);
 
 
