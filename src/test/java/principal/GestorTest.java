@@ -5,6 +5,8 @@ import facturacion.Llamada;
 import facturacion.Tarifa;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 
 public class GestorTest {
 
@@ -17,7 +19,7 @@ public class GestorTest {
     public void cambiarTarifaTest(){
         //assertThat();
         Tarifa tarifa = new Tarifa(.001d);
-        //assertEquals(0.001, tarifa.getTarifa());
+        assertEquals(0.001, tarifa.getTarifa(), 0.0001);
     }
 
     @Test

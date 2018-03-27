@@ -13,6 +13,7 @@ import facturacion.Factura;
 import facturacion.Llamada;
 import facturacion.PeriodoFacturacion;
 import facturacion.Tarifa;
+import generadores.GeneradorDatos;
 import generadores.GeneradorEmpresas;
 import generadores.GeneradorParticulares;
 import generadores.GeneradorPoblacion;
@@ -29,6 +30,10 @@ public class Consola extends FormateadorFecha {
     private static Random random = new Random();
 
     public static void main(String args[]) {
+        new Consola().ejecuta();
+    }
+
+    private void ejecuta() {
         Integer opcion = 0;
         OpcionesMenu opcionMenu;
         boolean salir = false;
@@ -113,7 +118,7 @@ public class Consola extends FormateadorFecha {
 
     //Metodos para los clientes
 
-    public static void altaCliente(String datos){
+    public void altaCliente(String datos){
         /*
         Para generar varios clientes particulares:
             1:10:P creará 10 particulares
@@ -166,7 +171,7 @@ public class Consola extends FormateadorFecha {
             System.out.println("El cliente ya existía.");
     }
 
-    public static void bajaCliente(){
+    public void bajaCliente(){
         String nif = pideNIF();
         Cliente cliente = gestor.bajaCliente(nif);
         if (cliente != null)
@@ -178,7 +183,7 @@ public class Consola extends FormateadorFecha {
             System.out.println("El cliente no existe.");
     }
 
-    public static void cambiarTarifa() {
+    public void cambiarTarifa() {
         String nif = pideNIF();
 
         //Todo: Estaría permitido esto?
@@ -203,7 +208,7 @@ public class Consola extends FormateadorFecha {
             System.out.println("El cliente no existe.");
     }
 
-    public static void buscarCliente() {
+    public void buscarCliente() {
         String nif = pideNIF();
 
         Cliente cliente = gestor.buscarCliente(nif);
@@ -227,7 +232,7 @@ public class Consola extends FormateadorFecha {
             System.out.println("No existe el cliente.");
     }
 
-    public static void listarClientes() {
+    public void listarClientes() {
         HashMap<String , Cliente> clientes = gestor.listarClientes();
         System.out.println("Listado de todos los clientes:\n");
         int i=1;
@@ -237,48 +242,11 @@ public class Consola extends FormateadorFecha {
     }
 
     //Metodos para las llamadas
-    private static int crearDuracion(){
-        /*
-        Generamos tres posibles tipos de llamadas, llamadas cortas, medianas y largas
-        las largas serán poco frecuentes, las media tendrán más posibilidades y las
-        cortas serán la más habituales para ello utilizamos un vector donde aparece
-        mayoritariamente un indice para llamadas cortas, unos pocos para media y menos
-        aun para largas.
-         1: cortas (>=300") +/- 5 min.;
-         2: medianas (>600") +/- 20 min.;
-         3: largas (> 7200") +/- 2 horas;
-         */
-        int vector[] = {
-                1, 1, 1, 2, 1, 1, 1, 2, 1, 1,
-                1, 2, 1, 1, 1, 1, 1, 1, 1, 1,
-                1, 1, 3, 1, 1, 2, 1, 1, 1, 1,
-                1, 2, 1, 1, 1, 1, 1, 1, 1, 1
-        };
-        int indice = vector[random.nextInt(vector.length)];
-        return random.nextInt(indice == 1 ? 300 : indice == 2 ? 1200 : 7200);
-    }
-
-    private static String crearTelefono(){
-        int pref = new int[] {9, 9, 9, 6, 6, 6, 6, 6, 9, 9, 6, 6, 6, 8, 9, 6, 9, 6, 9, 6, 9}[random.nextInt(20)];
-        return String.format("%d%08d", pref, random.nextInt(99999999));
-    }
-
-    private static String escogeNIF() {
+    private String escogeNIF() {
         return gestor.escogeNIF();
     }
 
-    private static Date creaFecha() {
-        Date fecha = new Date();
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(fecha);
-        cal.add(Calendar.MONTH, -1);
-        int i = random.nextInt(9);
-        int positivo = random.nextInt(50);
-        if (positivo < 25) i = -i;
-        cal.add(Calendar.DAY_OF_MONTH, i);
-        return cal.getTime();
-    }
-    public static void insertarLlamada(String datos){
+    public void insertarLlamada(String datos){
         /*
         Modo automático:
             7:10:<DNI> -> genera 10 llamadas al DNI <DNI>.
@@ -297,9 +265,10 @@ public class Consola extends FormateadorFecha {
             llamada = gestor.insertarLlamada(pideFecha(), pideNIF(), telefono, duracion);
         } else {
             String nif;
-            telefono = crearTelefono();
-            duracion = crearDuracion();
-            Date fecha = creaFecha();
+            GeneradorDatos genDatos = new GeneradorDatos();
+            telefono = genDatos.getTelefono();
+            duracion = genDatos.getDuracion();
+            Date fecha = genDatos.getFecha();
             if (datos.matches("^\\d+$")) {
                 //nos pasan el numero de iteraciones
                 nif = escogeNIF();
@@ -316,7 +285,9 @@ public class Consola extends FormateadorFecha {
                     veces = random.nextInt(Integer.valueOf(datos.split(":")[1]));
                     veces = veces < 3 ? 3 : veces;
                     for (int i = 0; i < veces; i++) {
-                        llamada = gestor.insertarLlamada(creaFecha(), (String) nif2, crearTelefono(), crearDuracion());
+                        llamada = gestor.insertarLlamada(
+                                genDatos.getFecha(), (String) nif2, genDatos.getTelefono(), genDatos.getDuracion()
+                        );
                         ttl++;
                     }
                 }
@@ -333,7 +304,7 @@ public class Consola extends FormateadorFecha {
             System.out.println("No se ha podido registrar la llamada.");
     }
 
-    public static void listarLlamadasCliente() {
+    public void listarLlamadasCliente() {
         String nif = pideNIF();
         ArrayList<Llamada> llamadas = gestor.listarLlamadasCliente(nif);
         System.out.printf("Relación de llamadas del cliente con NIF: %s%n", nif);
@@ -353,7 +324,7 @@ public class Consola extends FormateadorFecha {
 
     //Metodos para las facturas
 
-    public static void emitirFactura(String datos) {
+    public void emitirFactura(String datos) {
         String nif = pideNIF();
         Factura fact;
         if (!datos.equals("")) {
@@ -408,7 +379,7 @@ public class Consola extends FormateadorFecha {
             System.out.println("No se ha podido emitir la factura");
     }
 
-    public static void obtenerFactura() {
+    public void obtenerFactura() {
         System.out.print("Introduce el código de la factura: ");
         Scanner scanner = new Scanner(System.in);
         System.out.println();
@@ -419,7 +390,7 @@ public class Consola extends FormateadorFecha {
         mostrarFactura(factura, 1);
     }
 
-    public static void listarFacturasCliente(){
+    public void listarFacturasCliente(){
         String nif = pideNIF();
         ArrayList<Factura> facturas = gestor.listarFacturasCliente(nif);
         if (facturas == null) {
@@ -433,25 +404,25 @@ public class Consola extends FormateadorFecha {
     }
 
     //Otros métodos
-    private static void pideSeguir() {
+    private void pideSeguir() {
         System.out.print("\nPulsa [intro] para continuar");
         Scanner scanner = new Scanner(System.in);
         System.out.println();
         scanner.nextLine();
     }
 
-    private static String pideDato(String frase) {
+    private String pideDato(String frase) {
         System.out.printf("Introduce %s: ", frase);
         Scanner scanner = new Scanner(System.in);
         System.out.println();
         return scanner.next();
     }
 
-    private static String pideNIF() {
+    private String pideNIF() {
         return pideDato("el NIF del cliente");
     }
 
-    private static Date pideFecha() {
+    private Date pideFecha() {
         Date fecha = new Date();
         try {
             String usrInput = pideDato("una fecha para la llamada con el formato 'dd/mm/aaaa'");
@@ -463,7 +434,7 @@ public class Consola extends FormateadorFecha {
         return fecha;
     }
 
-    private static void mostrarFactura(Factura fact, int indice) {
+    private void mostrarFactura(Factura fact, int indice) {
         System.out.printf(
             "%3d.- Fecha Emisión: %s\n\t" +
             "Periodo de Facturación: %s\n\t" +
