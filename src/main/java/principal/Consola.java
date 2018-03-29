@@ -104,8 +104,10 @@ public class Consola extends FormateadorFecha {
                         break;
                     case CARGAR_DATOS:
                         cargarDatos();
+                        break;
                     case GUARDAR_DATOS:
                         guardarDatos();
+                        break;
                     case SALIR:
                         salir = true;
                         break;
@@ -479,6 +481,7 @@ public class Consola extends FormateadorFecha {
             ObjectInputStream ois = new ObjectInputStream(fis);
             gestor = (Gestor) ois.readObject();
             ois.close();
+            gestor.getClientes();
         } catch (FileNotFoundException | ClassNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {

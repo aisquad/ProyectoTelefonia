@@ -12,6 +12,7 @@ import java.util.*;
 /**
  * Created by al361930 on 27/02/18.
  */
+
 public class Gestor implements Serializable {
     //Atributos
     private HashMap<String, Cliente> clientes;

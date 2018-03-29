@@ -8,7 +8,7 @@ import java.util.Random;
  * Created by al361930 on 27/03/18.
  */
 public class GeneradorDatos {
-    private Random random;
+    private Random random = new Random();
 
     public String getTelefono(){
         int pref = new int[] {9, 9, 9, 6, 6, 6, 6, 6, 9, 9, 6, 6, 6, 8, 9, 6, 9, 6, 9, 6, 9}[random.nextInt(20)];
