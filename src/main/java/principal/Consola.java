@@ -10,6 +10,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import excepciones.LetraIncorrectaException;
 import facturacion.Factura;
 import facturacion.Llamada;
 import facturacion.PeriodoFacturacion;
@@ -101,6 +102,15 @@ public class Consola extends FormateadorFecha {
                         break;
                     case LISTAR_FACTURAS_CLIENTE:
                         listarFacturasCliente();
+                        break;
+                    case LLAMADAS_CLIENTE:
+                        llamadasCliente();
+                        break;
+                    case FACTURAS_CLIENTE:
+                        facturasCliente();
+                        break;
+                    case ALTAS_CLIENTES:
+                        altasClientes();
                         break;
                     case CARGAR_DATOS:
                         cargarDatos();
@@ -245,10 +255,14 @@ public class Consola extends FormateadorFecha {
         System.out.println("Listado de todos los clientes:\n");
         int i = 1;
         for (Cliente cliente : clientes.values()) {
-            System.out.printf("%3d.- %s %s%n", i++, cliente.getNIF(), cliente.getNombreCompleto());
+            System.out.printf("%3d.- ", i++);
+            mostrarCliente(cliente);
         }
     }
 
+    private void mostrarCliente(Cliente cliente){
+        System.out.printf("%s %s%n", cliente.getNIF(), cliente.getNombreCompleto());
+    }
     //Metodos para las llamadas
     private String escogeNIF() {
         return gestor.escogeNIF();
@@ -270,7 +284,7 @@ public class Consola extends FormateadorFecha {
             Scanner resp = new Scanner(System.in);
             System.out.println();
             duracion = resp.nextInt();
-            llamada = gestor.insertarLlamada(pideFecha(), pideNIF(), telefono, duracion);
+            llamada = gestor.insertarLlamada(pideFecha("para la llamada"), pideNIF(), telefono, duracion);
         } else {
             String nif;
             GeneradorDatos genDatos = new GeneradorDatos();
@@ -316,20 +330,26 @@ public class Consola extends FormateadorFecha {
         String nif = pideNIF();
         ArrayList<Llamada> llamadas = gestor.listarLlamadasCliente(nif);
         System.out.printf("Relación de llamadas del cliente con NIF: %s%n", nif);
-        int i = 1;
         if (llamadas == null)
             System.out.println("No hay llamadas para este cliente");
-        else
-            for (Llamada llamada : llamadas)
-                System.out.printf(
-                        "%3d.- Fecha: %s Tel.: %s Dur.: %s.%n",
-                        i++,
-                        formatoFecha.format(llamada.getFecha()),
-                        llamada.getTelefono(),
-                        new SegundosATexto().segundosATextoAbreviado(llamada.getDuracion())
-                );
+        else {
+            int i = 1;
+            for (Llamada llamada : llamadas) {
+                System.out.printf("%3d.-", i++);
+                mostrarLlamada(llamada);
+            }
+        }
     }
 
+    private void mostrarLlamada(Llamada llamada){
+        System.out.printf(
+                "Fecha: %s Tel.: %s Dur.: %s.%n",
+                formatoFecha.format(llamada.getFecha()),
+                llamada.getTelefono(),
+                new SegundosATexto().segundosATextoAbreviado(llamada.getDuracion())
+        );
+
+    }
     //Metodos para las facturas
 
     public void emitirFactura(String datos) {
@@ -427,13 +447,23 @@ public class Consola extends FormateadorFecha {
     }
 
     private String pideNIF() {
-        return pideDato("el NIF del cliente");
+        String nif = pideDato("el NIF del cliente");
+        String tabla = "TRWAGMYFPDXBNJZSQVHLCKE";
+        int numero =  Integer.parseInt(nif.substring(0,7));
+        char letra = tabla.charAt(numero % tabla.length());
+        if (nif.charAt(8) != letra)
+            try {
+                throw new LetraIncorrectaException();
+            } catch (LetraIncorrectaException e) {
+                e.printStackTrace();
+            }
+        return nif;
     }
 
-    private Date pideFecha() {
+    private Date pideFecha(String complemento) {
         Date fecha = new Date();
         try {
-            String usrInput = pideDato("una fecha para la llamada con el formato 'dd/mm/aaaa'");
+            String usrInput = pideDato(String.format("una fecha %s con el formato 'dd/mm/aaaa'", complemento));
             DateFormat format = new SimpleDateFormat("dd/MM/yyyy");
             fecha = format.parse(usrInput);
         } catch (ParseException e) {
@@ -443,21 +473,58 @@ public class Consola extends FormateadorFecha {
     }
 
     private void mostrarFactura(Factura fact, int indice) {
+        System.out.printf("%3d.- ", indice);
+        mostrarEncabezadoFactura(fact);
+        for (Llamada llamada : fact.getLlamadas())
+            System.out.println("\t" + llamada);
+        System.out.printf("%72s  %s%n", " ", String.format("%09d", 0).replace("0", "-"));
+        System.out.printf("%72s: %7.2f €%n", "Importe", fact.getImporte());
+    }
+
+    private void mostrarEncabezadoFactura(Factura fact){
         System.out.printf(
-                "%3d.- Fecha Emisión: %s\n\t" +
+                "Fecha Emisión: %s\n\t" +
                         "Periodo de Facturación: %s\n\t" +
                         "Nombre Completo del cliente: %s\n\t" +
                         "NIF del cliente: %s\n",
-                indice,
                 formatoFecha.format(fact.getFecha()),
                 fact.getPeriodoDeFacturacion().getPeriodo(),
                 fact.getCliente().getNombreCompleto(),
                 fact.getCliente().getNIF()
         );
-        for (Llamada llamada : fact.getLlamadas())
-            System.out.println("\t" + llamada);
-        System.out.printf("%72s  %s%n", " ", String.format("%09d", 0).replace("0", "-"));
-        System.out.printf("%72s: %7.2f €%n", "Importe", fact.getImporte());
+
+    }
+    private void llamadasCliente(){
+        Date fechaInicio = pideFecha("de inicio");
+        Date fechaFin = pideFecha("de finalización");
+        Set<Llamada> llamadas = gestor.llamadasCliente(fechaInicio, fechaFin);
+        int i = 1;
+        for(Llamada llamada : llamadas){
+            System.out.printf("%3d.- ", i++);
+            mostrarLlamada(llamada);
+        }
+    }
+
+    private void facturasCliente(){
+        Date fechaInicio = pideFecha("de inicio");
+        Date fechaFin = pideFecha("de finalización");
+        Set<Factura> facturas = gestor.facturasCliente(fechaInicio, fechaFin);
+        int i = 1;
+        for (Factura factura : facturas) {
+            System.out.printf("%3d.- ", i++);
+            mostrarEncabezadoFactura(factura);
+        }
+    }
+
+    private void altasClientes(){
+        Date fechaInicio = pideFecha("de inicio");
+        Date fechaFin = pideFecha("de finalización");
+        Set<Cliente> clientes = gestor.altasClientes(fechaInicio, fechaFin);
+        int i = 1;
+        for (Cliente cliente : clientes) {
+            System.out.printf("%3d.- ", i++);
+            mostrarCliente(cliente);
+        }
     }
 
     private void guardarDatos() {

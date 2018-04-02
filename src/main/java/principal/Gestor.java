@@ -5,6 +5,7 @@ import facturacion.Factura;
 import facturacion.Llamada;
 import facturacion.PeriodoFacturacion;
 import facturacion.Tarifa;
+import tiempo.Fecha;
 
 import java.io.Serializable;
 import java.util.*;
@@ -19,6 +20,8 @@ public class Gestor implements Serializable {
     private HashMap<Integer, Factura> facturasPorCodigo;
     private HashMap<String, ArrayList<Factura>> facturasPorCliente;
     private HashMap<String, ArrayList<Llamada>> llamadas;
+    private HashMap<Integer, Llamada> llamadasPorCodigo;
+
 
     //Contructores
     public Gestor() {
@@ -26,6 +29,7 @@ public class Gestor implements Serializable {
         facturasPorCodigo = new HashMap<Integer, Factura>();
         facturasPorCliente = new HashMap<String, ArrayList<Factura>>();
         llamadas = new HashMap<String, ArrayList<Llamada>>();
+        llamadasPorCodigo = new HashMap<Integer, Llamada>();
     }
 
     //Metodos
@@ -76,6 +80,7 @@ public class Gestor implements Serializable {
             llamadas.put(nif, listaLlamadasCliente);
         }
         listaLlamadasCliente.add(llamada);
+        llamadasPorCodigo.put(llamada.getId(), llamada);
         return llamada;
     }
 
@@ -91,6 +96,7 @@ public class Gestor implements Serializable {
             llamadas.put(nif, listaLlamadasCliente);
         }
         listaLlamadasCliente.add(llamada);
+        llamadasPorCodigo.put(llamada.getId(), llamada);
         return llamada;
     }
 
@@ -153,4 +159,27 @@ public class Gestor implements Serializable {
         Object array[] = getClientes();
         return (String) array[random.nextInt(array.length)];
     }
+
+    public Set<Llamada> llamadasCliente(Date fechaInicio, Date fechaFin){
+        return entreDosFechas(llamadasPorCodigo, fechaInicio, fechaFin);
+    }
+
+    public Set<Factura> facturasCliente(Date fechaInicio, Date fechaFin){
+        return entreDosFechas(facturasPorCodigo,fechaInicio, fechaFin);
+    }
+
+    public Set<Cliente> altasClientes(Date fechaInicio, Date fechaFin){
+        return entreDosFechas(clientes, fechaInicio, fechaFin);
+    }
+
+    public <T,V extends Fecha> Set<V> entreDosFechas(HashMap<T, V> cosas, Date fechaInicio, Date fechaFin){
+        Set<V> devolver = new HashSet<V>();
+        for(V objeto : cosas.values()){
+            if((objeto.getFecha().after(fechaInicio)  || objeto.getFecha().equals(fechaInicio)) && (objeto.getFecha().before(fechaFin) || objeto.getFecha().equals(fechaFin))) {
+                devolver.add(objeto);
+            }
+        }
+        return devolver;
+    }
+
 }

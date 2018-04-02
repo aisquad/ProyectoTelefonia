@@ -14,8 +14,8 @@ public enum OpcionesMenu implements Descripcion, Apartado {
     ALTA_NUEVO_CLIENTE("Nuevo cliente.", 1),
     BAJA_CLIENTE("Baja Cliente.", 1),
     MODIFICAR_TARIFA("Modificar tarifa cliente.", 1),
-    BUSCAR_CLIENTE("Buscar Cliente por NIF", 1),
-    LISTAR_CLIENTES("Lista de Clientes", 1),
+    BUSCAR_CLIENTE("Buscar Cliente por NIF.", 1),
+    LISTAR_CLIENTES("Lista de Clientes.", 1),
     /* LLAMADAS */
     ALTA_LLAMADA("Nueva llamada.", 2),
     LISTAR_LLAMADAS("Lista de llamadas de Cliente.", 2),
@@ -23,10 +23,13 @@ public enum OpcionesMenu implements Descripcion, Apartado {
     EMITIR_FATURA("Emisión Nueva Factura.", 3),
     OBTENER_FACTURA("Mostrar Factura por Código.", 3),
     LISTAR_FACTURAS_CLIENTE("Lista Facturas Cliente.", 3),
+    ALTAS_CLIENTES("Alta clientes entre dos fechas.", 4),
+    LLAMADAS_CLIENTE("Llamadas de un cliente entre dos fechas.", 4),
+    FACTURAS_CLIENTE("Facturas de un cliente entre dos fechas.", 4),
     /* GENERALIDADES */
-    CARGAR_DATOS("Cargar datos", 4),
-    GUARDAR_DATOS("Guardar datos", 4),
-    SALIR("Salir del programa.", 4);
+    CARGAR_DATOS("Cargar datos.", 5),
+    GUARDAR_DATOS("Guardar datos.", 5),
+    SALIR("Salir del programa.", 5);
 
 
     private String descripcion;
@@ -52,7 +55,7 @@ public enum OpcionesMenu implements Descripcion, Apartado {
     public static String getMenu() {
         String s = "";
         int seccion = 0;
-        final String apartados[] = {"", "Clientes", "Llamadas", "Facturas", "Salir"};
+        final String apartados[] = {"", "Clientes", "Llamadas", "Facturas", "Listados entre dos fechas", "Salir"};
 
         for (OpcionesMenu opcion : OpcionesMenu.values()) {
             if (seccion < opcion.getApartado())

@@ -15,10 +15,12 @@ import java.util.Date;
 
 public class Llamada extends FormateadorFecha implements Serializable, Fecha {
     //Atributos
+    private static Integer id;
     private String numeroTelefono;
     private Date fechaInicio;
     private int duracion;
     private Cliente cliente;
+
 
     //Contructores
     public Llamada () {
@@ -26,6 +28,7 @@ public class Llamada extends FormateadorFecha implements Serializable, Fecha {
         fechaInicio = new Date();
         duracion = 0;
         cliente = null;
+        id++;
     }
 
     public Llamada(String numeroTelefono, int duracion, Cliente cliente) {
@@ -54,6 +57,10 @@ public class Llamada extends FormateadorFecha implements Serializable, Fecha {
         return fechaInicio;
     }
 
+    public Integer getId(){
+        return id;
+    }
+    public Cliente getCliente(){ return cliente; }
     public String getTelefono() {
         return numeroTelefono;
     }
