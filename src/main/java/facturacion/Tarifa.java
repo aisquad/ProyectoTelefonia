@@ -11,7 +11,7 @@ public class Tarifa implements Serializable {
 
     //Contructores
     public Tarifa() {
-        tarifa = 0.15d;
+        tarifa = 0.0015d;
     }
 
     public  Tarifa(Double tarifa) {

@@ -1,27 +1,25 @@
-package principal;
+package execpciones;
 
-import clientes.Cliente;
-import clientes.Particular;
 import excepciones.LetraIncorrectaException;
-import facturacion.Tarifa;
 import org.junit.Test;
-import poblaciones.Poblacion;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 public class ExcepcionTest {
 
     @Test
     public void comprobarExcepcionDeNIF(){
-        int nif = 52799498;
+        String nif = "52799498P";
         try {
             String tabla = "TRWAGMYFPDXBNJZSQVHLCKE";
-            char letra = tabla.charAt(nif % tabla.length());
-            if (letra == 'G')
+            int num = Integer.parseInt(nif.substring(0, 8));
+            char letraAlgoritmo = tabla.charAt(num % tabla.length());
+            if (letraAlgoritmo == 'P')
                 System.out.println("OK");
-            char c = 'D'; //el usuario ha introducido D (en vez de G)
-            if (c != letra)
+            else
+                System.out.printf("La letra del algoritmo es %s", letraAlgoritmo);
+            char c = 'G'; //el usuario ha introducido G (en vez de P)
+            if (c != 'P')
                 throw new LetraIncorrectaException();
             fail("No se ha producido la excepción.");
         } catch (LetraIncorrectaException e){
