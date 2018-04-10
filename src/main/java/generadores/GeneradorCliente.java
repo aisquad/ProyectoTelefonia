@@ -11,7 +11,7 @@ public class GeneradorCliente extends Generador {
         string = string.replaceAll("[íìîï]", "i");
         string = string.replaceAll("ñ", "n");
         string = string.replaceAll("[óòôö]", "o");
-        string = string.replaceAll("úùûü", "u");;
+        string = string.replaceAll("[úùûü]", "u");;
         return string;
     }
 
