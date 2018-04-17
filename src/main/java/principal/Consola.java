@@ -33,7 +33,10 @@ public class Consola extends FormateadorFecha {
     private Random random = new Random();
 
     public static void main(String args[]) {
-        new Consola().ejecuta();
+        Consola consola = new Consola();
+        consola.cargarDatos();
+        consola.ejecuta();
+        consola.guardarDatos();
     }
 
     private void ejecuta() {
@@ -132,13 +135,14 @@ public class Consola extends FormateadorFecha {
                 }
             }
         } while (!salir);
+
     }
 
     //Metodos para los clientes
 
     public void altaCliente(String datos) {
         /*
-        Para generar varios clientes particulares:
+        Para generar varios clientes:
             1:10:P creará 10 particulares
             1:5:E creará 5 empresas
          */
