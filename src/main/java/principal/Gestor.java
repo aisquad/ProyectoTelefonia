@@ -172,14 +172,14 @@ public class Gestor implements Serializable {
         return entreDosFechas(clientes, fechaInicio, fechaFin);
     }
 
-    public <T,V extends Fecha> Set<V> entreDosFechas(HashMap<T, V> cosas, Date fechaInicio, Date fechaFin){
-        Set<V> devolver = new HashSet<V>();
-        for(V objeto : cosas.values()){
+    public <T,V extends Fecha> Set<V> entreDosFechas(HashMap<T, V> diccElementos, Date fechaInicio, Date fechaFin){
+        Set<V> listaElementos = new HashSet<V>();
+        for(V objeto : diccElementos.values()){
             if((objeto.getFecha().after(fechaInicio)  || objeto.getFecha().equals(fechaInicio)) && (objeto.getFecha().before(fechaFin) || objeto.getFecha().equals(fechaFin))) {
-                devolver.add(objeto);
+                listaElementos.add(objeto);
             }
         }
-        return devolver;
+        return listaElementos;
     }
 
 }
