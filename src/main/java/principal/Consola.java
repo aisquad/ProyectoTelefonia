@@ -115,12 +115,6 @@ public class Consola extends FormateadorFecha {
                     case ALTAS_CLIENTES:
                         altasClientes();
                         break;
-                    case CARGAR_DATOS:
-                        cargarDatos();
-                        break;
-                    case GUARDAR_DATOS:
-                        guardarDatos();
-                        break;
                     case SALIR:
                         salir = true;
                         break;
@@ -217,11 +211,11 @@ public class Consola extends FormateadorFecha {
 
         Tarifa tarifaAntigua = gestor.cambiarTarifa(nif, importe);
         if (tarifaAntigua != null)
-            if (!tarifaAntigua.getTarifa().equals(importe))
+            if (!tarifaAntigua.getValor().equals(importe))
                 System.out.printf(
                         "Se ha cambiado la tarifa del cliente con el NIF %s de %.2f a %.2f",
                         nif,
-                        tarifaAntigua.getTarifa(),
+                        tarifaAntigua.getValor(),
                         importe
                 );
             else

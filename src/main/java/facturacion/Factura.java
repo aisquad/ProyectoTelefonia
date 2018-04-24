@@ -80,7 +80,7 @@ public class Factura extends FormateadorFecha implements Serializable, Fecha {
         int duracionTotal = 0;
         for(int i = 0 ; i < llamadas.size(); i++)
             duracionTotal += llamadas.get(i).getDuracion();
-        importe = duracionTotal * cliente.getTarifa().getTarifa();
+        importe = duracionTotal * cliente.getTarifa().getValor();
     }
 
     @Override

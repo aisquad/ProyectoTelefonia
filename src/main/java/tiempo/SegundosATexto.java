@@ -79,12 +79,4 @@ public class SegundosATexto {
         }
         return rtn;
     }
-
-    public static void main (String args []) {
-        //Método usado únicamente para pruebas
-        SegundosATexto obj = new SegundosATexto();
-        int array[] = {3466, 300, 290, 122350, 1234, 6347, 3606};
-        for (int i : array)
-            System.out.printf("%d s: %s%n", i, obj.segundosATextoAbreviado(i));
-    }
 }

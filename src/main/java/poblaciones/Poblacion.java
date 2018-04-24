@@ -29,7 +29,7 @@ public class Poblacion implements Serializable {
     }
 
     public void setCodigoPostal(String id) {
-        if (id.length() < 1 || id.length() > 5)
+        if (!id.matches("^\\d{5}$"))
             throw new IllegalArgumentException();
         codigoPostal = id;
     }

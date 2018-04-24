@@ -60,7 +60,11 @@ public class Llamada extends FormateadorFecha implements Serializable, Fecha {
     public Integer getId(){
         return id;
     }
-    public Cliente getCliente(){ return cliente; }
+
+    public Cliente getCliente(){
+        return cliente;
+    }
+
     public String getTelefono() {
         return numeroTelefono;
     }
@@ -79,7 +83,7 @@ public class Llamada extends FormateadorFecha implements Serializable, Fecha {
             formatoFecha.format(fechaInicio),
             numeroTelefono,
             new SegundosATexto().segundosATextoAbreviado(duracion),
-            String.format("%01.2f", cliente.getTarifa().getTarifa() * duracion)
+            String.format("%01.2f", cliente.getTarifa().getValor() * duracion)
         );
     }
 
