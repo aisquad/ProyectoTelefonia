@@ -41,8 +41,7 @@ public class GeneradorDatos {
         int i = random.nextInt(9);
         int positivo = random.nextInt(50);
         if (positivo < 25) i = -i;
-        cal.add(Calendar.DAY_OF_MONTH, i);
-        return cal.getTime();
+        return fecha.withDayOfMonth(i);
     }
 
 
