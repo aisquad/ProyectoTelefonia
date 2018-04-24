@@ -2,7 +2,7 @@ package facturacion;
 
 public class TarifaBasica extends Tarifa {
 
-    private double valor = .15d / 60;
+    //private double valor = .15d / 60;
 
     public TarifaBasica(Double valor) {
         super(valor);
@@ -15,6 +15,6 @@ public class TarifaBasica extends Tarifa {
 
     @Override
     public Double getCosteLlamada(Llamada llamada) {
-        return null;
+        return llamada.getDuracion() * getValor();
     }
 }

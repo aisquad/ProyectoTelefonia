@@ -1,7 +1,7 @@
 package generadores;
 
 import java.util.Calendar;
-import java.util.LocalDateTime;
+import java.time.LocalDateTime;
 import java.util.Random;
 
 /**
@@ -37,10 +37,7 @@ public class GeneradorDatos {
     }
 
     public LocalDateTime getFecha() {
-        LocalDateTime fecha = new LocalDateTime();
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(fecha);
-        cal.add(Calendar.MONTH, -1);
+        LocalDateTime fecha = LocalDateTime.now();
         int i = random.nextInt(9);
         int positivo = random.nextInt(50);
         if (positivo < 25) i = -i;
