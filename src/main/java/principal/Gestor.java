@@ -84,7 +84,7 @@ public class Gestor implements Serializable {
         return llamada;
     }
 
-    public Llamada insertarLlamada(Date fecha, String nif, String telefono, int duracion) {
+    public Llamada insertarLlamada(LocalDateTime fecha, String nif, String telefono, int duracion) {
         Cliente cliente = clientes.get(nif);
         if (cliente==null)
             return null;
@@ -106,7 +106,7 @@ public class Gestor implements Serializable {
 
     //Metodos relacionados con las facturasPorCodigo
 
-    public Factura emitirFactura(String nif, Date fecha) {
+    public Factura emitirFactura(String nif, LocalDateTime fecha) {
         Cliente cliente = clientes.get(nif);
         ArrayList<Llamada> llamadasTotales = llamadas.get(nif);
         if (cliente == null && llamadasTotales == null)
@@ -117,7 +117,7 @@ public class Gestor implements Serializable {
         periodo.calcularPeriodo(fecha);
 
         for(Llamada llamada : llamadasTotales){
-            Date fechaEmision = llamada.getFecha();
+            LocalDateTime fechaEmision = llamada.getFecha();
             if (
                 (fechaEmision.after(periodo.getInicioPeriodo()) || fechaEmision.equals(periodo.getInicioPeriodo()))
                 && (fechaEmision.before(periodo.getFinPeriodo()) || fechaEmision.equals(periodo.getFinPeriodo())) ) {
@@ -160,19 +160,19 @@ public class Gestor implements Serializable {
         return (String) array[random.nextInt(array.length)];
     }
 
-    public Set<Llamada> llamadasCliente(Date fechaInicio, Date fechaFin){
+    public Set<Llamada> llamadasCliente(LocalDateTime fechaInicio, LocalDateTime fechaFin){
         return entreDosFechas(llamadasPorCodigo, fechaInicio, fechaFin);
     }
 
-    public Set<Factura> facturasCliente(Date fechaInicio, Date fechaFin){
+    public Set<Factura> facturasCliente(LocalDateTime fechaInicio, LocalDateTime fechaFin){
         return entreDosFechas(facturasPorCodigo,fechaInicio, fechaFin);
     }
 
-    public Set<Cliente> altasClientes(Date fechaInicio, Date fechaFin){
+    public Set<Cliente> altasClientes(LocalDateTime fechaInicio, LocalDateTime fechaFin){
         return entreDosFechas(clientes, fechaInicio, fechaFin);
     }
 
-    public <T,V extends Fecha> Set<V> entreDosFechas(HashMap<T, V> diccElementos, Date fechaInicio, Date fechaFin){
+    public <T,V extends Fecha> Set<V> entreDosFechas(HashMap<T, V> diccElementos, LocalDateTime fechaInicio, LocalDateTime fechaFin){
         Set<V> listaElementos = new HashSet<V>();
         for(V objeto : diccElementos.values()){
             if((objeto.getFecha().after(fechaInicio)  || objeto.getFecha().equals(fechaInicio)) && (objeto.getFecha().before(fechaFin) || objeto.getFecha().equals(fechaFin))) {

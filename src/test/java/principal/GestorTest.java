@@ -11,7 +11,7 @@ import org.junit.Test;
 import poblaciones.Poblacion;
 import principal.Gestor;
 
-import java.util.Date;
+import java.util.LocalDateTime;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
@@ -43,7 +43,7 @@ public class GestorTest {
         //Crear factura y llamada para test
         llamada = new Llamada("697454669", 70, cliente);
         gestor.insertarLlamada(llamada.getCliente().getNIF(), llamada.getTelefono(), llamada.getDuracion());
-        factura = gestor.emitirFactura(cliente.getNIF(), new Date());
+        factura = gestor.emitirFactura(cliente.getNIF(), new LocalDateTime());
     }
 
     @Test

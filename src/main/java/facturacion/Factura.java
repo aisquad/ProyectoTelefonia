@@ -5,8 +5,8 @@ import tiempo.Fecha;
 import tiempo.FormateadorFecha;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 
 /**
  * Created by al361930 on 27/02/18.
@@ -15,7 +15,7 @@ import java.util.Date;
 public class Factura extends FormateadorFecha implements Serializable, Fecha {
     //Atributos
     private static int idFactura;
-    private Date fechaEmision;
+    private LocalDateTime fechaEmision;
     private PeriodoFacturacion periodoFacturacion;
     private Double importe;
     private Cliente cliente;
@@ -24,7 +24,7 @@ public class Factura extends FormateadorFecha implements Serializable, Fecha {
     //Constructores
     public Factura () {
         idFactura++;
-        fechaEmision = new Date();
+        fechaEmision = LocalDateTime.now();
         periodoFacturacion = new PeriodoFacturacion();
         importe = 0d;
         cliente = null;
@@ -33,7 +33,7 @@ public class Factura extends FormateadorFecha implements Serializable, Fecha {
 
     public Factura (Cliente cliente, ArrayList<Llamada> llamadas) {
         idFactura++;
-        fechaEmision = new Date();
+        fechaEmision = LocalDateTime.now();
         periodoFacturacion = new PeriodoFacturacion();
         periodoFacturacion.calcularPeriodo(fechaEmision);
         this.cliente = cliente;
@@ -46,7 +46,7 @@ public class Factura extends FormateadorFecha implements Serializable, Fecha {
         return idFactura;
     }
 
-    public Date getFecha() {
+    public LocalDateTime getFecha() {
         return fechaEmision;
     }
 
@@ -66,7 +66,7 @@ public class Factura extends FormateadorFecha implements Serializable, Fecha {
         return llamadas;
     }
 
-    public void setPeriodoDeFacturacion(Date fecha) {
+    public void setPeriodoDeFacturacion(LocalDateTime fecha) {
         periodoFacturacion = new PeriodoFacturacion();
         periodoFacturacion.calcularPeriodo(fecha);
     }
