@@ -5,16 +5,13 @@ import clientes.Empresa;
 import clientes.Particular;
 
 import java.io.*;
-import java.text.DateFormat;
+import java.text.LocalDateTimeFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.text.SimpleLocalDateTimeFormat;
 import java.util.*;
 
 import excepciones.LetraIncorrectaException;
-import facturacion.Factura;
-import facturacion.Llamada;
-import facturacion.PeriodoFacturacion;
-import facturacion.Tarifa;
+import facturacion.*;
 import generadores.GeneradorDatos;
 import generadores.GeneradorEmpresas;
 import generadores.GeneradorParticulares;
@@ -115,12 +112,6 @@ public class Consola extends FormateadorFecha {
                     case ALTAS_CLIENTES:
                         altasClientes();
                         break;
-                    case CARGAR_DATOS:
-                        cargarDatos();
-                        break;
-                    case GUARDAR_DATOS:
-                        guardarDatos();
-                        break;
                     case SALIR:
                         salir = true;
                         break;
@@ -169,7 +160,7 @@ public class Consola extends FormateadorFecha {
         Cliente cliente;
         if (usrInput.equals("P"))
             cliente = new Particular(
-                    new Tarifa(.001d),
+                    new TarifaBasica(.001d),
                     nombre,
                     genPart.getDNI(),
                     poblacion,
@@ -179,7 +170,7 @@ public class Consola extends FormateadorFecha {
         else {
             GeneradorEmpresas genEmp = new GeneradorEmpresas();
             cliente = new Empresa(
-                    new Tarifa(.002d),
+                    new TarifaBasica(.002d),
                     genEmp.getAleatorio(poblacion),
                     genEmp.getCIF(),
                     poblacion,
@@ -217,11 +208,11 @@ public class Consola extends FormateadorFecha {
 
         Tarifa tarifaAntigua = gestor.cambiarTarifa(nif, importe);
         if (tarifaAntigua != null)
-            if (!tarifaAntigua.getTarifa().equals(importe))
+            if (!tarifaAntigua.getValor().equals(importe))
                 System.out.printf(
                         "Se ha cambiado la tarifa del cliente con el NIF %s de %.2f a %.2f",
                         nif,
-                        tarifaAntigua.getTarifa(),
+                        tarifaAntigua.getValor(),
                         importe
                 );
             else
@@ -294,7 +285,7 @@ public class Consola extends FormateadorFecha {
             GeneradorDatos genDatos = new GeneradorDatos();
             telefono = genDatos.getTelefono();
             duracion = genDatos.getDuracion();
-            Date fecha = genDatos.getFecha();
+            LocalDateTime fecha = genDatos.getFecha();
             if (datos.matches("^\\d+$")) {
                 //nos pasan el numero de iteraciones
                 nif = escogeNIF();
@@ -377,15 +368,15 @@ public class Consola extends FormateadorFecha {
             Scanner scanner = new Scanner(System.in);
             String usrInput = scanner.nextLine();
             if (usrInput.equals(""))
-                fact = gestor.emitirFactura(nif, new Date());
+                fact = gestor.emitirFactura(nif, new LocalDateTime());
             else {
-                DateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+                LocalDateTimeFormat format = new SimpleLocalDateTimeFormat("dd/MM/yyyy");
                 try {
                     if (usrInput.matches("(3[10]|[12]?\\\\d+)/(1[0-2]|[1-9])/20(1[0-8]|0\\d)")) {
-                        Date fecha = format.parse(usrInput);
-                        fact = gestor.emitirFactura(nif, new Date());
+                        LocalDateTime fecha = format.parse(usrInput);
+                        fact = gestor.emitirFactura(nif, new LocalDateTime());
                     } else {
-                        Date fecha1, fecha2;
+                        LocalDateTime fecha1, fecha2;
                         usrInput += usrInput.trim();
                         usrInput.replace("  +", " ");
                         String tokens[] = usrInput.split(" ");
@@ -464,11 +455,11 @@ public class Consola extends FormateadorFecha {
         return nif;
     }
 
-    private Date pideFecha(String complemento) {
-        Date fecha = new Date();
+    private LocalDateTime pideFecha(String complemento) {
+        LocalDateTime fecha = new LocalDateTime();
         try {
             String usrInput = pideDato(String.format("una fecha %s con el formato 'dd/mm/aaaa'", complemento));
-            DateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+            LocalDateTimeFormat format = new SimpleLocalDateTimeFormat("dd/MM/yyyy");
             fecha = format.parse(usrInput);
         } catch (ParseException e) {
             e.printStackTrace();
@@ -499,8 +490,8 @@ public class Consola extends FormateadorFecha {
 
     }
     private void llamadasCliente(){
-        Date fechaInicio = pideFecha("de inicio");
-        Date fechaFin = pideFecha("de finalización");
+        LocalDateTime fechaInicio = pideFecha("de inicio");
+        LocalDateTime fechaFin = pideFecha("de finalización");
         Set<Llamada> llamadas = gestor.llamadasCliente(fechaInicio, fechaFin);
         int i = 1;
         for(Llamada llamada : llamadas){
@@ -510,8 +501,8 @@ public class Consola extends FormateadorFecha {
     }
 
     private void facturasCliente(){
-        Date fechaInicio = pideFecha("de inicio");
-        Date fechaFin = pideFecha("de finalización");
+        LocalDateTime fechaInicio = pideFecha("de inicio");
+        LocalDateTime fechaFin = pideFecha("de finalización");
         Set<Factura> facturas = gestor.facturasCliente(fechaInicio, fechaFin);
         int i = 1;
         for (Factura factura : facturas) {
@@ -521,8 +512,8 @@ public class Consola extends FormateadorFecha {
     }
 
     private void altasClientes(){
-        Date fechaInicio = pideFecha("de inicio");
-        Date fechaFin = pideFecha("de finalización");
+        LocalDateTime fechaInicio = pideFecha("de inicio");
+        LocalDateTime fechaFin = pideFecha("de finalización");
         Set<Cliente> clientes = gestor.altasClientes(fechaInicio, fechaFin);
         int i = 1;
         for (Cliente cliente : clientes) {

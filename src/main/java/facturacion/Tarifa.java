@@ -5,25 +5,31 @@ import java.io.Serializable;
 /**
  * Created by al361930 on 27/02/18.
  */
-public class Tarifa implements Serializable {
+public abstract class Tarifa implements Serializable {
     //Atributos
-    private double tarifa;
+    private double valor = .15 / 60;
+
+    /*
+    private double basica = .15 / 60;
+    private double reducida = .05 / 60;
+    private double gratis = 0d;
+     */
 
     //Contructores
-    public Tarifa() {
-        tarifa = 0.0015d;
-    }
-
-    public  Tarifa(Double tarifa) {
-        this.tarifa = tarifa;
+    public  Tarifa(Double valor) {
+        this.valor = valor;
     }
 
     //Metodos
-    public Double getTarifa() {
-        return tarifa;
+    public Double getValor() {
+        return valor;
     }
 
     public String getTarifaConFormato() {
-        return String.format("%01.2f", tarifa);
+        return String.format("%01.2f", valor);
     }
+
+    public abstract String getDescripcion();
+
+    public abstract Double getCosteLlamada(Llamada llamada);
 }

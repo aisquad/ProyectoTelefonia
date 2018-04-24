@@ -5,7 +5,7 @@ import facturacion.Tarifa;
 import poblaciones.Poblacion;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * Created by al361930 on 27/02/18.
@@ -17,7 +17,7 @@ public abstract class Cliente implements Serializable, Fecha {
     private String nif;
     private Poblacion poblacion;
     private String correoElectronico;
-    private Date fechaAlta;
+    private LocalDateTime fechaAlta;
 
     protected boolean activo; //Si se le da de baja es false
 
@@ -38,12 +38,12 @@ public abstract class Cliente implements Serializable, Fecha {
         this.nif = nif;
         this.poblacion = poblacion;
         this.correoElectronico = correoElectronico;
-        fechaAlta = new Date();
+        fechaAlta = LocalDateTime.now();
         activo = true;
     }
 
     //Metodos
-    public Date getFecha(){
+    public LocalDateTime getFecha(){
         return activo ? fechaAlta : null;
     }
 

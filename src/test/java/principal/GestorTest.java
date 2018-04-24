@@ -6,7 +6,6 @@ import facturacion.Factura;
 import facturacion.Llamada;
 import facturacion.Tarifa;
 import generadores.GeneradorPoblacion;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import poblaciones.Poblacion;
@@ -51,9 +50,9 @@ public class GestorTest {
     @Test
     public void cambiarTarifaTest(){
         Tarifa tarifa = new Tarifa();
-        assertThat(tarifa.getTarifa(), is(0.0015d));
+        assertThat(tarifa.getValor(), is(0.0015d));
         tarifa = new Tarifa(.001d);
-        assertThat(tarifa.getTarifa(), is(0.001));
+        assertThat(tarifa.getValor(), is(0.001));
     }
 
     @Test

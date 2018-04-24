@@ -27,8 +27,6 @@ public enum OpcionesMenu implements Descripcion, Apartado {
     LLAMADAS_CLIENTE("Llamadas de un cliente entre dos fechas.", 4),
     FACTURAS_CLIENTE("Facturas de un cliente entre dos fechas.", 4),
     /* GENERALIDADES */
-    CARGAR_DATOS("Cargar datos.", 5),
-    GUARDAR_DATOS("Guardar datos.", 5),
     SALIR("Salir del programa.", 5);
 
 
