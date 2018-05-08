@@ -1,14 +1,14 @@
 package principal;
 
-import clientes.Cliente;
-import clientes.Particular;
-import facturacion.Factura;
-import facturacion.Llamada;
-import facturacion.Tarifa;
-import generadores.GeneradorPoblacion;
+import modelo.clientes.Cliente;
+import modelo.clientes.Particular;
+import modelo.facturacion.Factura;
+import modelo.facturacion.Llamada;
+import modelo.facturacion.Tarifa;
+import modelo.generadores.GeneradorPoblacion;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import poblaciones.Poblacion;
+import modelo.poblaciones.Poblacion;
 
 import java.util.LocalDateTime;
 

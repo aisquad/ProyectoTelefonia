@@ -1,11 +1,11 @@
 package principal;
 
-import clientes.Cliente;
-import facturacion.Factura;
-import facturacion.Llamada;
-import facturacion.PeriodoFacturacion;
-import facturacion.Tarifa;
-import tiempo.Fecha;
+import modelo.clientes.Cliente;
+import modelo.facturacion.Factura;
+import modelo.facturacion.Llamada;
+import modelo.facturacion.PeriodoFacturacion;
+import modelo.facturacion.Tarifa;
+import modelo.tiempo.Fecha;
 
 import java.io.Serializable;
 import java.util.*;
@@ -34,7 +34,7 @@ public class Gestor implements Serializable {
 
     //Metodos
 
-    //Metodos relacionados con los clientes
+    //Metodos relacionados con los modelo.clientes
 
     public Cliente altaNuevoCliente(Cliente cliente) {
         String nif = cliente.getNIF();
