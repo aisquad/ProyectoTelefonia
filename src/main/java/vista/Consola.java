@@ -5,9 +5,11 @@ import modelo.clientes.Empresa;
 import modelo.clientes.Particular;
 
 import java.io.*;
-import java.text.LocalDateTimeFormat;
+import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleLocalDateTimeFormat;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import modelo.excepciones.LetraIncorrectaException;
@@ -20,14 +22,14 @@ import controlador.menu.OpcionesMenu;
 import modelo.poblaciones.Poblacion;
 import modelo.tiempo.SegundosATexto;
 import modelo.tiempo.FormateadorFecha;
-import principal.Gestor;
+import modelo.Modelo;
 
 /**
  * Created by al361930 on 20/02/18.
  */
 public class Consola extends FormateadorFecha {
     private final String RUTA = "src/main/resources/data/";
-    private Gestor gestor = new Gestor();
+    private Modelo gestor = new Modelo();
     private Random random = new Random();
 
     public static void main(String args[]) {
@@ -350,13 +352,12 @@ public class Consola extends FormateadorFecha {
 
     public void emitirFactura(String datos) {
         String nif = pideNIF();
-        Factura fact;
+        Factura fact = null;
         if (!datos.equals("")) {
             //String mes = pideDato("el mes del periodo de facturación");
 
-            Calendar cal = Calendar.getInstance();
-            cal.set(Calendar.MONTH, Integer.parseInt(datos));
-            fact = gestor.emitirFactura(nif, cal.getTime());
+            LocalDateTime fecha = LocalDateTime.now();
+            fact = gestor.emitirFactura(nif, fecha.withMonth(Integer.parseInt(datos)));
         } else {
             System.out.print(
                     "Para el periodo del mes anterior pusle [intro]." +
@@ -369,15 +370,19 @@ public class Consola extends FormateadorFecha {
             Scanner scanner = new Scanner(System.in);
             String usrInput = scanner.nextLine();
             if (usrInput.equals(""))
-                fact = gestor.emitirFactura(nif, new LocalDateTime());
+                fact = gestor.emitirFactura(nif, LocalDateTime.now());
             else {
-                LocalDateTimeFormat format = new SimpleLocalDateTimeFormat("dd/MM/yyyy");
-                try {
+                DateFormat format = new SimpleDateFormat("dd/MM/yyyy");
                     if (usrInput.matches("(3[10]|[12]?\\\\d+)/(1[0-2]|[1-9])/20(1[0-8]|0\\d)")) {
-                        LocalDateTime fecha = format.parse(usrInput);
-                        fact = gestor.emitirFactura(nif, new LocalDateTime());
+                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+                        LocalDateTime fecha = LocalDateTime.now();
+                        String items[] = usrInput.split("/");
+                        int dia = Integer.parseInt(items[0]);
+                        int mes = Integer.parseInt(items[1]);
+                        int anyo = Integer.parseInt(items[2]);
+                        fact = gestor.emitirFactura(nif, fecha.withMonth(mes).withDayOfMonth(dia).withYear(anyo));
                     } else {
-                        LocalDateTime fecha1, fecha2;
+                     /*   LocalDateTime fecha1, fecha2;
                         usrInput += usrInput.trim();
                         usrInput.replace("  +", " ");
                         String tokens[] = usrInput.split(" ");
@@ -386,12 +391,8 @@ public class Consola extends FormateadorFecha {
                         PeriodoFacturacion periodoFacturacion = new PeriodoFacturacion(fecha1, fecha2);
                         fact = gestor.emitirFactura(nif, fecha1);
                         fact.setPeriodoDeFacturacion(periodoFacturacion);
-
+*/
                     }
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                    fact = null;
-                }
             }
         }
 
@@ -457,14 +458,10 @@ public class Consola extends FormateadorFecha {
     }
 
     private LocalDateTime pideFecha(String complemento) {
-        LocalDateTime fecha = new LocalDateTime();
-        try {
+        LocalDateTime fecha = LocalDateTime.now();
             String usrInput = pideDato(String.format("una fecha %s con el formato 'dd/mm/aaaa'", complemento));
-            LocalDateTimeFormat format = new SimpleLocalDateTimeFormat("dd/MM/yyyy");
-            fecha = format.parse(usrInput);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+            DateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+            fecha = LocalDateTime.now();
         return fecha;
     }
 
@@ -542,7 +539,7 @@ public class Consola extends FormateadorFecha {
         try {
             fis = new FileInputStream(RUTA + "gestor.bin");
             ObjectInputStream ois = new ObjectInputStream(fis);
-            gestor = (Gestor) ois.readObject();
+            gestor = (Modelo) ois.readObject();
             ois.close();
             gestor.getClientes();
         } catch (FileNotFoundException | ClassNotFoundException e) {

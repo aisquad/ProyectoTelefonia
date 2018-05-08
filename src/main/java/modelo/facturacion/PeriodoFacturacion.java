@@ -31,7 +31,7 @@ public class PeriodoFacturacion extends FormateadorFecha implements Serializable
         int anyo = fecha.getYear();
         Period period;
         inicioPeriodo = inicioPeriodo.withYear(anyo).withMonth(mes).withDayOfMonth(1);
-        finPeriodo = Period.ofMonths(1);
+        finPeriodo = inicioPeriodo.withDayOfMonth(28);
     }
 
     public String getPeriodo() {

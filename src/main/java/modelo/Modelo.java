@@ -1,20 +1,19 @@
-package principal;
+package modelo;
 
 import modelo.clientes.Cliente;
-import modelo.facturacion.Factura;
-import modelo.facturacion.Llamada;
-import modelo.facturacion.PeriodoFacturacion;
-import modelo.facturacion.Tarifa;
+import modelo.facturacion.*;
 import modelo.tiempo.Fecha;
+import vista.Vista;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.*;
 
 /**
  * Created by al361930 on 27/02/18.
  */
 
-public class Gestor implements Serializable {
+public class Modelo implements Serializable {
     //Atributos
     private HashMap<String, Cliente> clientes;
     private HashMap<Integer, Factura> facturasPorCodigo;
@@ -22,9 +21,12 @@ public class Gestor implements Serializable {
     private HashMap<String, ArrayList<Llamada>> llamadas;
     private HashMap<Integer, Llamada> llamadasPorCodigo;
 
+    private Vista vista ;
+
+
 
     //Contructores
-    public Gestor() {
+    public Modelo() {
         clientes = new HashMap<String, Cliente>();
         facturasPorCodigo = new HashMap<Integer, Factura>();
         facturasPorCliente = new HashMap<String, ArrayList<Factura>>();
@@ -33,6 +35,8 @@ public class Gestor implements Serializable {
     }
 
     //Metodos
+
+    public void setVista(Vista vista){ this.vista = vista ;}
 
     //Metodos relacionados con los modelo.clientes
 
@@ -50,8 +54,8 @@ public class Gestor implements Serializable {
     }
 
     public Tarifa cambiarTarifa(String nif, Double importe) {
-        Tarifa nuevaTarifa = new Tarifa(importe);
-        Tarifa tarifaAntigua = new Tarifa();
+        Tarifa nuevaTarifa = new TarifaBasica(importe);
+        Tarifa tarifaAntigua = new TarifaBasica(.05);
         Cliente cliente = clientes.get(nif);
         if (cliente != null)
             tarifaAntigua = cliente.getTarifa();
@@ -118,11 +122,11 @@ public class Gestor implements Serializable {
 
         for(Llamada llamada : llamadasTotales){
             LocalDateTime fechaEmision = llamada.getFecha();
-            if (
+/*            if (
                 (fechaEmision.after(periodo.getInicioPeriodo()) || fechaEmision.equals(periodo.getInicioPeriodo()))
                 && (fechaEmision.before(periodo.getFinPeriodo()) || fechaEmision.equals(periodo.getFinPeriodo())) ) {
                     llamadasPeriodoFacturacion.add(llamada);
-            }
+            }*/
         }
 
         Factura factura = new Factura(cliente, llamadasPeriodoFacturacion);
@@ -175,10 +179,10 @@ public class Gestor implements Serializable {
     public <T,V extends Fecha> Set<V> entreDosFechas(HashMap<T, V> diccElementos, LocalDateTime fechaInicio, LocalDateTime fechaFin){
         Set<V> listaElementos = new HashSet<V>();
         for(V objeto : diccElementos.values()){
-            if((objeto.getFecha().after(fechaInicio)  || objeto.getFecha().equals(fechaInicio)) && (objeto.getFecha().before(fechaFin) || objeto.getFecha().equals(fechaFin))) {
+ /*           if((objeto.getFecha().after(fechaInicio)  || objeto.getFecha().equals(fechaInicio)) && (objeto.getFecha().before(fechaFin) || objeto.getFecha().equals(fechaFin))) {
                 listaElementos.add(objeto);
             }
-        }
+*/        }
         return listaElementos;
     }
 

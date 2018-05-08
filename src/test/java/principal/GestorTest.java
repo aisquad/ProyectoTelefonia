@@ -1,16 +1,18 @@
 package principal;
 
+import modelo.Modelo;
 import modelo.clientes.Cliente;
 import modelo.clientes.Particular;
 import modelo.facturacion.Factura;
 import modelo.facturacion.Llamada;
 import modelo.facturacion.Tarifa;
+import modelo.facturacion.TarifaBasica;
 import modelo.generadores.GeneradorPoblacion;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import modelo.poblaciones.Poblacion;
 
-import java.util.LocalDateTime;
+import java.time.LocalDateTime;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertThat;
@@ -21,7 +23,7 @@ public class GestorTest {
     //atributos
     private static Cliente cliente;
     private static Llamada llamada;
-    private static Gestor gestor = new Gestor();
+    private static Modelo gestor = new Modelo();
     private static Factura factura ;
 
 
@@ -30,7 +32,7 @@ public class GestorTest {
     public static void crearCliente(){
         //Crear cliente para test
 
-        Tarifa tarifa = new Tarifa();
+        Tarifa tarifa = new TarifaBasica(.05);
         String nombre = "Alejandra";
         String apellido = "Sinuosa";
         Poblacion poblacion = new Poblacion();
@@ -44,14 +46,14 @@ public class GestorTest {
         //Crear factura y llamada para test
         llamada = new Llamada("697454669", 70, cliente);
         gestor.insertarLlamada(llamada.getCliente().getNIF(), llamada.getTelefono(), llamada.getDuracion());
-        factura = gestor.emitirFactura(cliente.getNIF(), new LocalDateTime());
+        factura = gestor.emitirFactura(cliente.getNIF(), LocalDateTime.now());
     }
 
     @Test
     public void cambiarTarifaTest(){
-        Tarifa tarifa = new Tarifa();
+        Tarifa tarifa = new TarifaBasica(.05);
         assertThat(tarifa.getValor(), is(0.0015d));
-        tarifa = new Tarifa(.001d);
+        tarifa = new TarifaBasica(.001d);
         assertThat(tarifa.getValor(), is(0.001));
     }
 

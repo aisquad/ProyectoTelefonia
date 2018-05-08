@@ -29,5 +29,5 @@ public class TarifaReducida extends Tarifa {
         }
         return precioAhora;
 
-    }private double valor = .05d / 60;
+    }
 }
