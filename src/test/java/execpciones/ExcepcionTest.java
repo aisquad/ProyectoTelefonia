@@ -1,6 +1,6 @@
 package execpciones;
 
-import excepciones.LetraIncorrectaException;
+import modelo.excepciones.LetraIncorrectaException;
 import org.junit.Test;
 
 import static org.junit.Assert.fail;
